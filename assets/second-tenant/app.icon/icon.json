@@ -1,0 +1,33 @@
+{
+  "fill": "automatic",
+  "groups": [
+    {
+      "layers": [
+        {
+          "fill": {
+            "solid": "srgb:0.79027,0.04147,0.03414,1.00000"
+          },
+          "glass": true,
+          "hidden": false,
+          "image-name": "ios-icon-default.png",
+          "name": "ios-icon-default",
+          "position": {
+            "scale": 0.96,
+            "translation-in-points": [0, -52]
+          }
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": ["iOS"]
+  }
+}
