@@ -2,15 +2,60 @@
 
 Prototype kit for producing distinct Expo applications from configured Tenants.
 
-## Get started
+## Setup Instructions
 
-1. Install dependencies
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd expo-tenant-kit
+   ```
+
+2. **Install nvm (Node Version Manager) globally on the system**
+
+   - Mac and Linux: `https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script`
+   - Mac using Brew: `https://formulae.brew.sh/formula/nvm`
+   - Windows: `https://github.com/coreybutler/nvm-windows?tab=readme-ov-file#nvm-for-windows`
+
+3. **Verify nvm is correctly installed**
+
+   ```bash
+   nvm -v
+   ```
+
+4. **Use the correct Node.js version**
+
+   ```bash
+   nvm use
+   ```
+
+   If the version from `.nvmrc` is not installed yet, run:
+
+   ```bash
+   nvm install
+   nvm use
+   ```
+
+5. **Install Bun**
+
+   Use Bun for package scripts and dependency management in this repo. Do not use npm for local
+   setup, scripts, or dependency changes.
+
+   ```bash
+   bun --version
+   ```
+
+   If Bun is not installed, follow `https://bun.sh/docs/installation`.
+
+6. **Install dependencies**
 
    ```bash
    bun install
    ```
 
-2. Choose a Tenant for local development
+7. **Configure environment**
+
+   Create a `.env.local` file from the example file:
 
    ```bash
    cp .env.example .env.local
@@ -19,41 +64,88 @@ Prototype kit for producing distinct Expo applications from configured Tenants.
    Set `TENANT_SLUG` to one of the accepted Tenant Slugs, such as `first-tenant` or
    `second-tenant`. If `TENANT_SLUG` is omitted, the first configured Tenant is used.
 
-3. Start the app
+8. **Configure VS Code**
+
+   If you use VS Code, install the recommended workspace extensions when prompted. This repo
+   already includes workspace settings and a Prettier config.
+
+9. **Start the app**
 
    ```bash
-   bun expo start
+   bun run start
    ```
 
-In the output, you'll find options to open the app in a
+   The Expo CLI output includes options for opening the app in a development build, Android
+   emulator, iOS simulator, web browser, or Expo Go.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+10. **Run the default Tenant on iOS**
 
-## Tenant Selection Contract
+    ```bash
+    bun run ios
+    ```
 
-Each entry in `tenant-configs.ts` represents one independently branded application.
-`TENANT_SLUG` is the build-time selector for that configured Tenant.
+11. **Run the default Tenant on Android**
 
-The selected Tenant config is the source of truth for:
+    ```bash
+    bun run android
+    ```
 
-- Tenant ID
-- native app identity
-- package identity
-- app scheme
-- minimal theme accent
-- required native/app asset paths
+## Per Tenant Instructions
 
-Invalid Tenant Slugs fail during config resolution. Required assets for the selected
-Tenant are validated before the dynamic Expo config output is trusted.
+1. **Choose a Tenant Slug**
 
-Runtime app code reads Tenant ID from `Constants.expoConfig.extra.tenantId`. There is no
-active `EXPO_PUBLIC_TENANT_ID` runtime path.
+   Accepted Tenant Slugs currently live in `src/types/tenant-config.types.ts`:
 
-Business Model is a future concept and is intentionally out of scope for this prototype
-slice.
+   - `first-tenant` - the default Tenant when `TENANT_SLUG` is omitted.
+   - `second-tenant` - the second configured Tenant.
+
+   Full Tenant config lives in `tenant-configs.ts`.
+
+2. **Configure the selected Tenant**
+
+   Set the selected Tenant in `.env.local`:
+
+   ```bash
+   TENANT_SLUG=second-tenant
+   ```
+
+   For a one-off command, pass the Tenant Slug inline:
+
+   ```bash
+   TENANT_SLUG=second-tenant bun run ios
+   ```
+
+3. **Run the configured Tenant on iOS**
+
+   ```bash
+   bun run ios
+   ```
+
+4. **Run the configured Tenant on Android**
+
+   ```bash
+   bun run android
+   ```
+
+5. **Regenerate native projects after native config changes**
+
+   If a Tenant's native identity, package name, scheme, icons, splash assets, or plugin config
+   changes, regenerate native projects before running the native app:
+
+   ```bash
+   TENANT_SLUG=second-tenant bun expo prebuild --clean
+   ```
+
+6. **Add or update a Tenant**
+
+   To add a Tenant, update:
+
+   - `src/types/tenant-config.types.ts` - add the Tenant Slug to `TENANT_SLUGS`.
+   - `tenant-configs.ts` - add the Tenant's config entry.
+   - `assets/<tenant-slug>/icons/` - add required Android/general icons.
+   - `assets/<tenant-slug>/app.icon/` - add required iOS icon asset catalog files.
+
+   Required asset paths are validated when the dynamic Expo config resolves the selected Tenant.
 
 ## Checks
 
