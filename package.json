@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~56.0.16",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~56.0.9",
     "expo-constants": "~56.0.17",
     "expo-dev-client": "~56.0.19",
@@ -35,7 +36,10 @@
     "eslint-config-expo": "~56.0.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
-    "prettier": "^3.8.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.4",
+    "tsx": "^4.22.4",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -43,7 +47,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "private": true
 }
