@@ -1,12 +1,12 @@
-import { DEFAULT_GENERIC_TENANT_ID } from '@/constants/globals';
-import { TenantConfig } from '@/types/common.types';
+import Constants from 'expo-constants';
 
-const tenantId = process.env.EXPO_PUBLIC_TENANT_ID
-  ? Number(process.env.EXPO_PUBLIC_TENANT_ID)
-  : DEFAULT_GENERIC_TENANT_ID;
+import { TenantConfig } from '@/types/common.types';
+import { resolveRuntimeTenantConfig } from '@/utils/runtime-tenant-config';
 
 export const useTenantConfig = (): TenantConfig => {
-  return {
-    tenantId,
-  };
+  // Keep the hook shaped around a resolved config object so future runtime Tenant fields
+  // can be added without moving validation back into the hook.
+  const tenantConfig = resolveRuntimeTenantConfig(Constants.expoConfig?.extra);
+
+  return tenantConfig;
 };

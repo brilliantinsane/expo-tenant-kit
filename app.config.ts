@@ -1,13 +1,7 @@
 import 'tsx/cjs';
 
-import { type TenantSlug } from '@/types/tenant-config.types';
 import { ConfigContext, ExpoConfig } from 'expo/config';
-import { configs } from './tenant-configs';
-
-const defaultTenantSlug: TenantSlug = 'first-tenant';
-const tenant = (process.env.TENANT_SLUG ?? defaultTenantSlug) as TenantSlug;
-
-const getDynamicAppConfig = () => configs[tenant];
+import { resolveTenantConfig } from './tenant-configs';
 
 const COLORS = {
   light: '#F2F2F2',
@@ -15,8 +9,8 @@ const COLORS = {
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => {
-  const { name, slug, version, scheme, bundleIdentifier, packageName, theme, extra } =
-    getDynamicAppConfig();
+  const { tenantId, name, slug, version, scheme, bundleIdentifier, packageName, theme, extra } =
+    resolveTenantConfig({ tenantSlug: process.env.TENANT_SLUG });
 
   const assetPath = `./assets/${slug}`;
   const icons = `${assetPath}/icons`;
@@ -48,6 +42,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     extra: {
       ...extra,
+      tenantId,
       slug,
       theme,
     },

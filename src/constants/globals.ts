@@ -4,8 +4,6 @@ export const isWeb = Platform.OS === 'web';
 export const isAndroid = Platform.OS === 'android';
 export const isIos = Platform.OS === 'ios';
 
-export const DEFAULT_GENERIC_TENANT_ID = 0;
-
 export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
