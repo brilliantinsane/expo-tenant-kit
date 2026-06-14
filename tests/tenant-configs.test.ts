@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 
-import { resolveTenantConfig } from '../tenant-configs';
+import { configs, resolveTenantConfig } from '../tenant-configs';
 
 test('missing Tenant Slug resolves to the first configured Tenant', () => {
   const tenant = resolveTenantConfig({ tenantSlug: undefined });
@@ -26,6 +26,11 @@ test('resolved Tenant exposes a numeric Tenant ID', () => {
 
   assert.equal(Number.isInteger(tenant.tenantId), true);
   assert.equal(tenant.tenantId > 0, true);
+});
+
+test('Tenant EAS Project IDs are explicit configuration strings', () => {
+  assert.equal(typeof configs['first-tenant'].extra?.eas?.projectId, 'string');
+  assert.equal(typeof configs['second-tenant'].extra?.eas?.projectId, 'string');
 });
 
 test('invalid Tenant Slug throws a clear configuration error', () => {

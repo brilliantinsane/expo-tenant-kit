@@ -7,5 +7,12 @@
       "assets/*": ["./assets/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "app.config.ts", "tenant-configs.ts", "tests/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "scripts/**/*.ts",
+    "app.config.ts",
+    "tenant-configs.ts",
+    "tests/**/*.ts"
+  ]
 }

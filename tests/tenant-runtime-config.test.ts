@@ -37,6 +37,7 @@ function withTenantSlug<T>(tenantSlug: string | undefined, callback: () => T): T
 test('dynamic Expo config injects the resolved Tenant ID and native identity', () => {
   const config = withTenantSlug('second-tenant', () => createExpoConfig(configContext));
 
+  assert.equal(config.owner, 'brilliant-insane');
   assert.equal(config.extra?.tenantId, 2);
   assert.equal(config.extra?.slug, 'second-tenant');
   assert.equal(config.extra?.theme?.accent, '#ca0b09');

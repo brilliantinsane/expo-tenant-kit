@@ -1,6 +1,7 @@
 import 'tsx/cjs';
 
 import { ConfigContext, ExpoConfig } from 'expo/config';
+import { EXPO_OWNER } from './project-config';
 import { resolveTenantConfig } from './tenant-configs';
 
 const COLORS = {
@@ -20,6 +21,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name,
     slug,
+    owner: EXPO_OWNER,
     version,
     scheme,
     icon: `${icons}/icon.png`,

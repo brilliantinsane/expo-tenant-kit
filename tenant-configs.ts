@@ -1,7 +1,7 @@
 import {
   TENANT_SLUGS,
-  type TenantConfig,
   type TenantAppConfig,
+  type TenantConfig,
   type TenantSlug,
 } from '@/types/tenant-config.types';
 import { existsSync } from 'node:fs';
@@ -21,6 +21,7 @@ export const configs: TenantAppConfig = {
     },
     extra: {
       eas: {
+        // Fill in downstream private apps after creating or finding the Tenant's EAS Project; not secret; keep empty in OSS starter.
         projectId: '',
       },
     },
@@ -38,6 +39,7 @@ export const configs: TenantAppConfig = {
     },
     extra: {
       eas: {
+        // Fill in downstream private apps after creating or finding the Tenant's EAS Project; not secret; keep empty in OSS starter.
         projectId: '',
       },
     },
