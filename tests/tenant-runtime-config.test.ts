@@ -1,8 +1,8 @@
 /// <reference types="node" />
 
+import { type ConfigContext } from 'expo/config';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { type ConfigContext } from 'expo/config';
 
 import createExpoConfig from '../app.config';
 import { resolveRuntimeTenantConfig } from '../src/utils/runtime-tenant-config';
@@ -40,7 +40,7 @@ test('dynamic Expo config injects the resolved Tenant ID and native identity', (
   assert.equal(config.owner, 'brilliant-insane');
   assert.equal(config.extra?.tenantId, 2);
   assert.equal(config.extra?.slug, 'second-tenant');
-  assert.equal(config.extra?.theme?.accent, '#ca0b09');
+  assert.equal(config.extra?.theme?.accent, '#ef8520');
   assert.equal(config.ios?.bundleIdentifier, 'com.brilliantinsane.secondtenant');
   assert.equal(config.android?.package, 'com.brilliantinsane.secondtenant');
 });
@@ -53,7 +53,7 @@ test('runtime Tenant config exposes only the Tenant ID from Expo runtime config'
       resolveRuntimeTenantConfig({
         tenantId: 2,
         slug: 'second-tenant',
-        theme: { accent: '#ca0b09' },
+        theme: { accent: '#ef8520' },
       }),
       { tenantId: 2 },
     );

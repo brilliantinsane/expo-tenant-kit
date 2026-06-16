@@ -45,7 +45,7 @@ The demo Tenants are placeholders. Downstream apps should replace names, package
 | Tenant Slug     | App Name       | Tenant ID | Accent    | Native IDs                         |
 | --------------- | -------------- | --------: | --------- | ---------------------------------- |
 | `first-tenant`  | `FirstTenant`  |       `1` | `#208AEF` | `com.brilliantinsane.firsttenant`  |
-| `second-tenant` | `SecondTenant` |       `2` | `#ca0b09` | `com.brilliantinsane.secondtenant` |
+| `second-tenant` | `SecondTenant` |       `2` | `#ef8520` | `com.brilliantinsane.secondtenant` |
 
 If `TENANT_SLUG` is omitted, the first configured Tenant is used.
 

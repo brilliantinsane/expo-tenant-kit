@@ -58,6 +58,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           dark: {
             backgroundColor: COLORS.dark,
           },
+          android: {
+            size: 150,
+          },
         },
       ],
     ],

@@ -4,19 +4,36 @@
     {
       "layers": [
         {
-          "fill": {
-            "solid": "srgb:0.12549,0.54118,0.93725,1.00000"
-          },
-          "glass": true,
-          "hidden": false,
-          "image-name": "ios-icon-default.png",
-          "name": "ios-icon-default",
+          "image-name": "first.svg",
+          "name": "first",
           "position": {
-            "scale": 0.96,
-            "translation-in-points": [0, -52]
+            "scale": 1,
+            "translation-in-points": [121, -63]
+          }
+        },
+        {
+          "hidden": false,
+          "image-name": "base.svg",
+          "name": "base",
+          "position": {
+            "scale": 1,
+            "translation-in-points": [0, 43]
+          }
+        },
+        {
+          "image-name": "second.svg",
+          "name": "second",
+          "position": {
+            "scale": 1,
+            "translation-in-points": [-121, -63]
           }
         }
       ],
+      "name": "Group",
+      "position": {
+        "scale": 1.5,
+        "translation-in-points": [0, 30]
+      },
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5

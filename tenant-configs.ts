@@ -35,7 +35,7 @@ export const configs: TenantAppConfig = {
     bundleIdentifier: 'com.brilliantinsane.secondtenant',
     packageName: 'com.brilliantinsane.secondtenant',
     theme: {
-      accent: '#ca0b09',
+      accent: '#ef8520',
     },
     extra: {
       eas: {
@@ -70,7 +70,7 @@ function getRequiredTenantAssetPaths(tenantSlug: TenantSlug): string[] {
     `${icons}/android-icon-monochrome.png`,
     `${icons}/splash-icon.png`,
     `${iosIcon}/icon.json`,
-    `${iosIcon}/Assets/ios-icon-default.png`,
+    // `${iosIcon}/Assets/ios-icon-default.png`,
   ];
 }
 
