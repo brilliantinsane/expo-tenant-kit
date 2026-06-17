@@ -1,4 +1,4 @@
-# Expo Tenant Kit
+# Tenkit
 
 Domain language for a prototype kit that can produce distinct Expo applications and later support multiple tenants inside a broader business model.
 

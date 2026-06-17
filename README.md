@@ -1,6 +1,6 @@
-![Expo Tenant Kit banner](docs/readme-banner.svg)
+![Tenkit banner](docs/readme-banner.svg)
 
-Expo Tenant Kit lets you maintain one Expo codebase and ship it as separate branded mobile apps for different customers, brands, or markets.
+Tenkit lets you maintain one Expo codebase and ship it as separate branded mobile apps for different customers, brands, or markets.
 
 It uses a build-time `TENANT_SLUG` to apply each tenant's native app identity, metadata, icons, splash assets, theme values, runtime config, and EAS project mapping.
 
@@ -22,7 +22,7 @@ This kit keeps the shared application code in one place and moves brand-specific
 
 ## What This Is Not
 
-Expo Tenant Kit is not a backend multi-tenancy system, an in-app tenant switcher, or a finished white-label product. It is a project foundation for build-time tenantized Expo apps where each Tenant becomes its own native application.
+Tenkit is not a backend multi-tenancy system, an in-app tenant switcher, or a finished white-label product. It is a project foundation for build-time tenantized Expo apps where each Tenant becomes its own native application.
 
 The demo Tenants are placeholders. Downstream apps should replace names, package IDs, assets, EAS project IDs, and product UI with real Tenant data.
 

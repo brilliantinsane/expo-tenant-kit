@@ -10,7 +10,7 @@ export function createProgram() {
 
   program
     .name('tenant-cli')
-    .description('Tenant workflow commands for Expo Tenant Kit')
+    .description('Tenant workflow commands for Tenkit')
     .showHelpAfterError()
     .showSuggestionAfterError();
 
