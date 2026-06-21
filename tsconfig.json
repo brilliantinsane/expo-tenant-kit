@@ -11,8 +11,9 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "scripts/**/*.ts",
+    "starter-data/**/*.ts",
+    "examples/**/*.ts",
     "app.config.ts",
-    "tenant-configs.ts",
     "tests/**/*.ts"
   ]
 }

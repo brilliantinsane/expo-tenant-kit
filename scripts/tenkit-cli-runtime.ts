@@ -3,22 +3,23 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { select } from '@inquirer/prompts';
 
-import {
-  EAS_CLI_MISSING_MESSAGE,
-  TENANT_ENVIRONMENTS,
-  type BuildPrepareFlags,
-  type CommandPlan,
-  planBuildPrepare,
-  planBuildReset,
-} from './tenant-cli-core';
 import { EXPO_OWNER } from '../project-config';
-import { configs } from '../tenant-configs';
-import { TENANT_SLUGS, type TenantSlug } from '../src/types/tenant-config.types';
+import { activeSetup } from '../src/active-setup/manifest';
+import {
+  APP_VARIANT_ENVIRONMENTS,
+  EAS_CLI_MISSING_MESSAGE,
+  type BuildFlags,
+  type CommandPlan,
+  planBuild,
+  planReset,
+} from './tenkit-cli-core';
+import { getAppVariants, getDefaultAppVariant, type ActiveSetup } from '../src/setup-types/core';
 
 export type RuntimeDeps = {
   ci: boolean;
   expoToken?: string;
   expoOwner?: string;
+  activeSetup?: ActiveSetup;
   projectRoot?: string;
   isEasInstalled: () => boolean;
   isEasLoggedIn: () => boolean;
@@ -38,6 +39,7 @@ export function createRuntimeDeps(): RuntimeDeps {
     ci: process.env.CI === 'true',
     expoToken: process.env.EXPO_TOKEN,
     projectRoot: process.cwd(),
+    activeSetup,
     isEasInstalled: () => spawnSync('eas', ['--version'], { stdio: 'ignore' }).status === 0,
     isEasLoggedIn: () => spawnSync('eas', ['whoami'], { stdio: 'ignore' }).status === 0,
     promptSelect: ({ message, choices, defaultValue }) =>
@@ -48,7 +50,9 @@ export function createRuntimeDeps(): RuntimeDeps {
 }
 
 export function formatCommand(command: CommandPlan): string {
-  const env = command.env?.TENANT_SLUG ? `TENANT_SLUG=${command.env.TENANT_SLUG} ` : '';
+  const env = command.env?.APP_VARIANT_SLUG
+    ? `APP_VARIANT_SLUG=${command.env.APP_VARIANT_SLUG} `
+    : '';
 
   return `${env}${command.bin} ${command.args.join(' ')}`;
 }
@@ -133,7 +137,7 @@ function parseEnvFileValue(contents: string, key: string): string | undefined {
   return undefined;
 }
 
-function validatePulledEnvLocal(deps: RuntimeDeps, tenantSlug: TenantSlug) {
+function validatePulledEnvLocal(deps: RuntimeDeps, slug: string) {
   const envPath = join(deps.projectRoot ?? process.cwd(), '.env.local');
 
   if (!existsSync(envPath)) {
@@ -142,40 +146,47 @@ function validatePulledEnvLocal(deps: RuntimeDeps, tenantSlug: TenantSlug) {
     );
   }
 
-  const tenantSlugValue = parseEnvFileValue(readFileSync(envPath, 'utf8'), 'TENANT_SLUG');
+  const slugValue = parseEnvFileValue(readFileSync(envPath, 'utf8'), 'APP_VARIANT_SLUG');
 
-  if (!tenantSlugValue) {
+  if (!slugValue) {
     throw new Error(
-      `.env.local is missing TENANT_SLUG. Add TENANT_SLUG=${tenantSlug} to this Tenant's EAS environment variables before running Build Preparation.`,
+      `.env.local is missing APP_VARIANT_SLUG. Add APP_VARIANT_SLUG=${slug} to this App Variant's EAS environment variables before running Build Preparation.`,
     );
   }
 
-  if (tenantSlugValue !== tenantSlug) {
+  if (slugValue !== slug) {
     throw new Error(
-      `.env.local TENANT_SLUG "${tenantSlugValue}" does not match selected Tenant "${tenantSlug}". Fix this Tenant's EAS environment variables before running Build Preparation.`,
+      `.env.local APP_VARIANT_SLUG "${slugValue}" does not match selected Slug "${slug}". Fix this App Variant's EAS environment variables before running Build Preparation.`,
     );
   }
 }
 
-function hasPlatformSelection(flags: BuildPrepareFlags) {
+function hasPlatformSelection(flags: BuildFlags) {
   return Boolean(flags.platform || flags.ios || flags.android || flags.both);
 }
 
-async function promptForBuildPrepareFlags(flags: BuildPrepareFlags, deps: RuntimeDeps) {
+async function promptForBuildFlags(flags: BuildFlags, deps: RuntimeDeps) {
   if (deps.ci) {
     return flags;
   }
 
-  const tenant =
-    flags.tenant ??
-    (await deps.promptSelect({
-      message: 'Select a Tenant:',
-      choices: TENANT_SLUGS.map((slug) => ({
-        name: `${configs[slug].name} (${slug})`,
-        value: slug,
-      })),
-      defaultValue: TENANT_SLUGS[0],
-    }));
+  const activeSetupConfig = deps.activeSetup ?? activeSetup;
+  const appVariants = getAppVariants(activeSetupConfig);
+  const slug =
+    flags.slug ??
+    (appVariants.length === 1
+      ? appVariants[0].slug
+      : await deps.promptSelect({
+          message: 'Select an App Variant:',
+          choices: appVariants.map((variant) => ({
+            name: `${variant.name} (${variant.slug})`,
+            value: variant.slug,
+          })),
+          defaultValue: appVariants.find(
+            (variant) =>
+              variant.appVariantId === getDefaultAppVariant(activeSetupConfig).appVariantId,
+          )?.slug,
+        }));
 
   const platform = hasPlatformSelection(flags)
     ? flags.platform
@@ -192,8 +203,8 @@ async function promptForBuildPrepareFlags(flags: BuildPrepareFlags, deps: Runtim
   const environment =
     flags.env ??
     (await deps.promptSelect({
-      message: 'Select a Tenant Environment:',
-      choices: TENANT_ENVIRONMENTS.map((environment) => ({
+      message: 'Select an App Variant Environment:',
+      choices: APP_VARIANT_ENVIRONMENTS.map((environment) => ({
         name: environment,
         value: environment,
       })),
@@ -202,21 +213,27 @@ async function promptForBuildPrepareFlags(flags: BuildPrepareFlags, deps: Runtim
 
   return {
     ...flags,
-    tenant,
+    slug,
     env: environment,
     platform,
   };
 }
 
-export async function runBuildPrepare(flags: BuildPrepareFlags, deps = createRuntimeDeps()) {
-  const resolvedFlags = await promptForBuildPrepareFlags(flags, deps);
-  const plan = planBuildPrepare({
+export async function runBuild(flags: BuildFlags, deps = createRuntimeDeps()) {
+  const resolvedFlags = await promptForBuildFlags(flags, deps);
+  const plan = planBuild({
     flags: resolvedFlags,
-    context: { ci: deps.ci, expoToken: deps.expoToken, expoOwner: deps.expoOwner ?? EXPO_OWNER },
+    context: {
+      ci: deps.ci,
+      expoToken: deps.expoToken,
+      expoOwner: deps.expoOwner ?? EXPO_OWNER,
+      activeSetup: deps.activeSetup ?? activeSetup,
+    },
   });
 
   deps.log('Preparing build');
-  deps.log(`Tenant: ${plan.tenant.name} (${plan.tenant.slug})`);
+  deps.log(`Setup Type: ${plan.activeSetup.setupType}`);
+  deps.log(`App Variant: ${plan.appVariant.name} (${plan.appVariant.slug})`);
   deps.log(`Environment: ${plan.environment}`);
   deps.log(`Platform: ${plan.platform}`);
 
@@ -227,16 +244,20 @@ export async function runBuildPrepare(flags: BuildPrepareFlags, deps = createRun
     deps.runCommand(command);
 
     if (isEasEnvPullCommand(command)) {
-      validatePulledEnvLocal(deps, plan.tenant.slug);
+      validatePulledEnvLocal(deps, plan.appVariant.slug);
     }
   }
 }
 
-export async function runBuildReset(deps = createRuntimeDeps()) {
-  const plan = planBuildReset();
+export async function runReset(deps = createRuntimeDeps()) {
+  const plan = planReset({
+    expoOwner: deps.expoOwner ?? EXPO_OWNER,
+    activeSetup: deps.activeSetup ?? activeSetup,
+  });
 
   deps.log('Resetting build');
-  deps.log(`Tenant: ${plan.tenant.name} (${plan.tenant.slug})`);
+  deps.log(`Setup Type: ${plan.activeSetup.setupType}`);
+  deps.log(`App Variant: ${plan.appVariant.name} (${plan.appVariant.slug})`);
   deps.log(`Environment: ${plan.environment}`);
   deps.log(`Platform: ${plan.platform}`);
 
@@ -247,7 +268,7 @@ export async function runBuildReset(deps = createRuntimeDeps()) {
     deps.runCommand(command);
 
     if (isEasEnvPullCommand(command)) {
-      validatePulledEnvLocal(deps, plan.tenant.slug);
+      validatePulledEnvLocal(deps, plan.appVariant.slug);
     }
   }
 }

@@ -2,7 +2,8 @@ import 'tsx/cjs';
 
 import { ConfigContext, ExpoConfig } from 'expo/config';
 import { EXPO_OWNER } from './project-config';
-import { resolveTenantConfig } from './tenant-configs';
+import { activeSetup } from './src/active-setup/manifest';
+import { resolveAppVariantConfig } from './src/setup-types/core';
 
 const COLORS = {
   light: '#F2F2F2',
@@ -10,8 +11,11 @@ const COLORS = {
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => {
-  const { tenantId, name, slug, version, scheme, bundleIdentifier, packageName, theme, extra } =
-    resolveTenantConfig({ tenantSlug: process.env.TENANT_SLUG });
+  const { name, slug, version, scheme, bundleIdentifier, packageName, extra } =
+    resolveAppVariantConfig({
+      activeSetup,
+      slug: process.env.APP_VARIANT_SLUG,
+    });
 
   const assetPath = `./assets/${slug}`;
   const icons = `${assetPath}/icons`;
@@ -44,9 +48,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     extra: {
       ...extra,
-      tenantId,
-      slug,
-      theme,
     },
     plugins: [
       'expo-router',
