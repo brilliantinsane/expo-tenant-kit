@@ -21,7 +21,7 @@ Example: `feat(components): add new prop to avatar component`
 
 ### Package Manager
 
-Use Bun for package scripts and dependency management. Do not use npm.
+Use pnpm for package scripts and dependency management. Do not use npm, Yarn, or Bun.
 
 ## Response Footer
 

@@ -1,12 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Appearance, useColorScheme } from 'react-native';
 
 import { resolveTheme, type ThemeScheme } from '@/constants/theme';
+import { useActiveSetupConfig } from '@/hooks/use-active-setup-config';
 import { AppThemeContext } from '@/hooks/use-theme';
-import { resolveTenantAccent } from '@/utils/tenant-accent';
+import { resolveActiveSetupAccent } from '@/utils/active-setup-accent';
 
 const STORAGE_KEY = 'app-theme-scheme';
 
@@ -20,6 +20,7 @@ function isThemeScheme(value: unknown): value is ThemeScheme {
 
 export function AppThemeProvider({ children }: AppThemeProviderProps) {
   const systemScheme = useColorScheme();
+  const activeSetupConfig = useActiveSetupConfig();
   const [storedScheme, setStoredScheme] = useState<ThemeScheme | null>(null);
 
   useEffect(() => {
@@ -42,8 +43,8 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
   }, []);
 
   const scheme: ThemeScheme = storedScheme ?? (systemScheme === 'dark' ? 'dark' : 'light');
-  const tenantAccent = Constants.expoConfig?.extra?.theme?.accent;
-  const accent = useMemo(() => resolveTenantAccent(tenantAccent), [tenantAccent]);
+  const activeSetupAccent = activeSetupConfig.theme.accent;
+  const accent = useMemo(() => resolveActiveSetupAccent(activeSetupAccent), [activeSetupAccent]);
   const colors = useMemo(() => resolveTheme(scheme, accent), [accent, scheme]);
 
   const setScheme = useCallback((nextScheme: ThemeScheme) => {

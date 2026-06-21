@@ -2,6 +2,7 @@
   "name": "tenkit",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.26.1",
   "dependencies": {
     "@expo/ui": "~56.0.16",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -47,14 +48,21 @@
   },
   "scripts": {
     "start": "expo start",
-    "build:prepare": "bun scripts/tenant-cli.ts build-prepare",
-    "build:reset": "bun scripts/tenant-cli.ts build-reset",
+    "tenkit": "tsx scripts/tenkit-cli.ts",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit --pretty false",
     "lint": "expo lint",
     "format": "prettier --write .",
     "prepare": "husky"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "unrs-resolver"
+    ]
   },
   "private": true
 }

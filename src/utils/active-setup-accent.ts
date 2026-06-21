@@ -50,7 +50,7 @@ function hexToAccentHsl(hex: string): AccentHsl {
   };
 }
 
-export function resolveTenantAccent(accent: unknown): AccentHsl {
+export function resolveActiveSetupAccent(accent: unknown): AccentHsl {
   const hex = normalizeHexColor(accent);
 
   if (!hex) {
