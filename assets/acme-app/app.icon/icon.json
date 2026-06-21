@@ -4,36 +4,18 @@
     {
       "layers": [
         {
-          "image-name": "second.svg",
-          "name": "second",
+          "fill": {
+            "solid": "srgb:0.92157,0.14510,0.33725,1.00000"
+          },
+          "glass": true,
+          "image-name": "final-tenkit-logo.svg",
+          "name": "final-tenkit-logo",
           "position": {
-            "scale": 1,
-            "translation-in-points": [-121, -63]
-          }
-        },
-        {
-          "hidden": false,
-          "image-name": "base.svg",
-          "name": "base",
-          "position": {
-            "scale": 1,
-            "translation-in-points": [0, 43]
-          }
-        },
-        {
-          "image-name": "first.svg",
-          "name": "first",
-          "position": {
-            "scale": 1,
-            "translation-in-points": [121, -63]
+            "scale": 4.6,
+            "translation-in-points": [0, 10]
           }
         }
       ],
-      "name": "Group",
-      "position": {
-        "scale": 1.5,
-        "translation-in-points": [0, 30]
-      },
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5

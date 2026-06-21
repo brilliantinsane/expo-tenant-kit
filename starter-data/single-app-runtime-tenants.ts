@@ -15,7 +15,7 @@ export const singleAppRuntimeTenantsStarterData = {
       bundleIdentifier: 'com.example.acmeapp',
       packageName: 'com.example.acmeapp',
       theme: {
-        accent: '#2563eb',
+        accent: '#eb2556',
       },
       eas: {
         projectId: '',
