@@ -64,6 +64,7 @@ test('setup dry-run prints the Single App Runtime Tenants file plan without writ
     assert.equal(result.applied, false);
     assert.equal(existsSync(join(projectRoot, 'src/active-setup/manifest.ts')), false);
     assert.equal(events[0], 'Setup Type: single-app-runtime-tenants');
+    assert.equal(events[1], 'Active Setup changes:');
     assert.ok(events.includes('- write src/active-setup/manifest.ts'));
     assert.equal(events.includes('format'), false);
   } finally {
@@ -121,6 +122,79 @@ test('non-interactive setup requires explicit setup type and confirmation', asyn
           },
         ),
       /Non-interactive setup requires --setup-type and --yes/,
+    );
+  } finally {
+    rmSync(projectRoot, { recursive: true, force: true });
+  }
+});
+
+test('interactive setup confirmation replaces existing setup-owned targets', async () => {
+  const projectRoot = createProjectRoot();
+  const events: string[] = [];
+  let confirmationDefault: boolean | undefined;
+
+  try {
+    mkdirSync(join(projectRoot, 'src/active-setup'), { recursive: true });
+    writeFileSync(join(projectRoot, 'src/active-setup/manifest.ts'), 'existing setup');
+
+    const result = await runSetup(
+      { setupType: 'single-app-runtime-tenants' },
+      {
+        ci: false,
+        projectRoot,
+        promptSelect: async () => {
+          throw new Error('explicit setup type should not prompt for setup selection');
+        },
+        promptConfirm: async (input) => {
+          confirmationDefault = input.defaultValue;
+          return true;
+        },
+        log: (message) => events.push(message),
+        formatFiles: () => events.push('format'),
+      },
+    );
+
+    assert.equal(result.applied, true);
+    assert.equal(confirmationDefault, true);
+    assert.match(
+      readFileSync(join(projectRoot, 'src/active-setup/manifest.ts'), 'utf8'),
+      /setupType: 'single-app-runtime-tenants'/,
+    );
+    assert.match(
+      readFileSync(join(projectRoot, 'src/active-setup/runtime-tenants.ts'), 'utf8'),
+      /runtimeTenantId: 100/,
+    );
+    assert.ok(events.includes('Setup applied.'));
+  } finally {
+    rmSync(projectRoot, { recursive: true, force: true });
+  }
+});
+
+test('local --yes does not replace existing setup-owned targets without force', async () => {
+  const projectRoot = createProjectRoot();
+
+  try {
+    mkdirSync(join(projectRoot, 'src/active-setup'), { recursive: true });
+    writeFileSync(join(projectRoot, 'src/active-setup/manifest.ts'), 'existing setup');
+
+    await assert.rejects(
+      () =>
+        runSetup(
+          { setupType: 'single-app-runtime-tenants', yes: true },
+          {
+            ci: false,
+            projectRoot,
+            promptSelect: async () => {
+              throw new Error('explicit setup type should not prompt for setup selection');
+            },
+            promptConfirm: async () => {
+              throw new Error('--yes should not prompt for confirmation');
+            },
+            log: () => {},
+            formatFiles: () => {},
+          },
+        ),
+      /Re-run interactively or use --force/,
     );
   } finally {
     rmSync(projectRoot, { recursive: true, force: true });

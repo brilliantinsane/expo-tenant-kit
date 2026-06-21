@@ -1,5 +1,5 @@
-import { spawnSync } from 'node:child_process';
 import { confirm, select } from '@inquirer/prompts';
+import { spawnSync } from 'node:child_process';
 
 import { activeSetup } from '../src/active-setup/manifest';
 import { type SetupType } from '../src/setup-types/core';
@@ -84,9 +84,10 @@ export async function runSetup(flags: SetupFlags, deps = createSetupRuntimeDeps(
   const setupType = await resolveSetupType(flags, deps);
   const plan = planSetup(setupType);
   const formattedPlan = formatSetupFilePlan(plan);
+  let confirmedInteractively = false;
 
   deps.log(`Setup Type: ${plan.setupType}`);
-  deps.log('File plan:');
+  deps.log('Active Setup changes:');
 
   for (const line of formattedPlan) {
     deps.log(`- ${line}`);
@@ -103,24 +104,26 @@ export async function runSetup(flags: SetupFlags, deps = createSetupRuntimeDeps(
 
   if (!flags.yes) {
     const confirmed = await deps.promptConfirm({
-      message: 'Apply this setup file plan?',
-      defaultValue: false,
+      message: 'Apply these Active Setup changes?',
+      defaultValue: true,
     });
 
     if (!confirmed) {
       throw new Error('Setup cancelled.');
     }
+
+    confirmedInteractively = true;
   }
 
   const result = applySetupPlan({
     plan,
     projectRoot: deps.projectRoot,
-    force: flags.force,
+    force: flags.force || confirmedInteractively,
   });
 
   if (result.blockedTargets.length > 0) {
     throw new Error(
-      `Setup target paths already exist or have local changes: ${result.blockedTargets.join(', ')}. Re-run with --force to replace them explicitly.`,
+      `Setup target paths already exist or have local changes: ${result.blockedTargets.join(', ')}. Re-run interactively or use --force to replace them explicitly.`,
     );
   }
 

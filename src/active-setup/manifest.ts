@@ -7,7 +7,7 @@ export const activeSetup = defineWhiteLabelAppsSetup({
     {
       appVariantId: 1,
       slug: 'first-tenant',
-      name: 'FirstTenant',
+      name: 'First Tenant',
       version: '1.0.0',
       scheme: 'firsttenant',
       bundleIdentifier: 'com.brilliantinsane.firsttenant',
@@ -16,14 +16,13 @@ export const activeSetup = defineWhiteLabelAppsSetup({
         accent: '#208AEF',
       },
       eas: {
-        // Fill in downstream private apps after creating or finding the App Variant's EAS Project.
         projectId: '',
       },
     },
     {
       appVariantId: 2,
       slug: 'second-tenant',
-      name: 'SecondTenant',
+      name: 'Second Tenant',
       version: '1.0.0',
       scheme: 'secondtenant',
       bundleIdentifier: 'com.brilliantinsane.secondtenant',
@@ -32,7 +31,6 @@ export const activeSetup = defineWhiteLabelAppsSetup({
         accent: '#ef8520',
       },
       eas: {
-        // Fill in downstream private apps after creating or finding the App Variant's EAS Project.
         projectId: '',
       },
     },

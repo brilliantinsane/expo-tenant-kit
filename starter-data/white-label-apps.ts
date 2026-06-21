@@ -7,7 +7,7 @@ export const whiteLabelAppsStarterSetup = defineWhiteLabelAppsSetup({
     {
       appVariantId: 1,
       slug: 'first-tenant',
-      name: 'FirstTenant',
+      name: 'First Tenant',
       version: '1.0.0',
       scheme: 'firsttenant',
       bundleIdentifier: 'com.brilliantinsane.firsttenant',
@@ -22,7 +22,7 @@ export const whiteLabelAppsStarterSetup = defineWhiteLabelAppsSetup({
     {
       appVariantId: 2,
       slug: 'second-tenant',
-      name: 'SecondTenant',
+      name: 'Second Tenant',
       version: '1.0.0',
       scheme: 'secondtenant',
       bundleIdentifier: 'com.brilliantinsane.secondtenant',

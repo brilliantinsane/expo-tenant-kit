@@ -17,7 +17,7 @@ const easJson = JSON.parse(readFileSync('eas.json', 'utf8')) as EasJson;
 
 test('eas.json defines tenant-neutral EAS build profiles', () => {
   assert.deepEqual(easJson.cli, {
-    version: '>= 20.2.0',
+    version: '>= 20.3.0',
     appVersionSource: 'remote',
   });
   assert.deepEqual(easJson.build?.development, {
