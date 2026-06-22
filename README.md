@@ -1,51 +1,72 @@
-![Tenkit banner](docs/readme-banner.svg)
+# tenkit
 
-Tenkit lets you maintain one Expo codebase and ship it as separate branded mobile apps, or as one app that opens multiple runtime business contexts.
+![Tenkit banner](assets/hero.png)
 
-Tenkit is cloneable-starter-first: the root app has exactly one **Active Setup** at a time. The default Active Setup is **White Label Apps**, where each branded native application is an **App Variant**. **Single App Runtime Tenants** is also available as a local Scaffold, where one App Variant can open multiple **Runtime Tenants** inside the same native app. **Generic With Standalone App Variants** is available as a local Scaffold for one generic App Variant plus selected standalone App Variants.
+Build and ship multiple Expo apps from one codebase.
 
-## Why This Exists
+Tenkit helps you build one mobile product and ship it as many different apps, each with its own name, icon, colors, app-store identity, and build setup.
 
-Many mobile products start as one app, then need a second app with a different name, icon, bundle identifier, package name, theme, and EAS project. Copying the whole repository works once, but it creates drift immediately.
+Instead of copying the same Expo project every time a new customer, venue, brand, or business unit needs an app, Tenkit keeps the shared product in one place and makes each app identity explicit.
 
-Tenkit keeps shared application code in one place and moves setup-specific native identity into a typed Active Setup Manifest. Build Preparation selects an App Variant, pulls the right EAS environment into `.env.local`, validates it, and runs clean Expo prebuild.
+## Highlights
 
-## Core Concepts
+- Ship multiple branded mobile apps from one Expo codebase.
+- Keep app name, icon, scheme, bundle ID, package name, theme, and EAS project configuration in typed setup data.
+- Switch app variants locally with `APP_VARIANT_SLUG`.
+- Prepare clean native projects with one CLI command: `pnpm tenkit build`.
+- Support white-label apps, single-app runtime tenants, and hybrid generic-plus-standalone setups.
+- Expose public runtime bootstrap data through `extra.activeSetup`.
+- Validate setup behavior with focused tests around app variants, runtime tenants, CLI planning, Expo config, and example conformance.
 
-| Concept        | Meaning                                                                                                              |
-| -------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Active Setup   | The Setup Type currently installed in the root app. The root app resolves exactly one Active Setup.                  |
-| Setup Type     | The relationship model between App Variants and Runtime Tenants.                                                     |
-| App Variant    | Build-time native app identity: app name, slug, scheme, bundle ID, package name, assets, and EAS project.            |
-| Runtime Tenant | The business, organization, customer, or venue opened at runtime. Build Preparation does not select Runtime Tenants. |
-| Example        | An opt-in verified reference. Examples are not imported by the root app.                                             |
-| Scaffold       | A local setup operation that rewrites setup-owned files in the cloned starter.                                       |
-| Template       | Future standalone project generation. Tenkit does not ship `tenkit init` yet.                                        |
+## What You Can Build
 
-## What You Get
+Tenkit is for the moment when one app needs to become a family of apps without becoming a family of codebases.
 
-- One shared Expo app using Expo Router, React Native, TypeScript, and pnpm.
-- A typed Active Setup Manifest at `src/active-setup/manifest.ts`.
-- Standard Expo config fields resolved from the selected App Variant.
-- Public runtime bootstrap data under `extra.activeSetup`.
-- Local-source Single App Runtime Tenants and Generic With Standalone App Variants shared models and Scaffolds.
-- A single local CLI surface: `pnpm tenkit setup`, `pnpm tenkit build`, `pnpm tenkit reset`, and `pnpm tenkit doctor`.
-- Tests around Active Setup resolution, runtime config, CLI planning/runtime behavior, setup file-plan safety, EAS JSON, and example conformance.
+Examples:
 
-## What This Is Not
+- A studio group that wants one shared product, but a separate app for each studio.
+- A venue network where every venue needs its own icon, name, theme, and app-store listing.
+- A B2B product that ships one branded app per customer.
+- A franchise app where most locations live inside one generic app, but major locations get standalone apps.
+- An internal platform team that wants one Expo codebase with controlled app identities for different business units.
 
-Tenkit is not a backend multi-tenancy system, a billing/auth framework, or a finished white-label product. Backend-source Runtime Tenant data, backend contracts, caching, auth, Runtime Tenant picker UI, and standalone Template generation are future work.
+## Who It Is For
 
-## Current Active Setup
+Use Tenkit when your Expo product is starting to outgrow a single app identity.
 
-White Label Apps is installed by default.
+Common cases:
 
-| App Variant ID | Slug            | App Name       | Accent    | Native IDs                         |
-| -------------- | --------------- | -------------- | --------- | ---------------------------------- |
-| `1`            | `first-tenant`  | `FirstTenant`  | `#208AEF` | `com.brilliantinsane.firsttenant`  |
-| `2`            | `second-tenant` | `SecondTenant` | `#ef8520` | `com.brilliantinsane.secondtenant` |
+- A product ships one native app per customer or brand.
+- A marketplace, studio group, agency, venue network, or franchise needs shared code with separate app-store identities.
+- One app should open several runtime business contexts.
+- Most tenants should live inside a generic app, but a few need their own standalone app.
+- You want the build-time app identity to be explicit, typed, reviewable, and testable.
 
-If `APP_VARIANT_SLUG` is omitted, the default App Variant is used.
+Tenkit is not a backend multi-tenancy system, billing/auth framework, customer admin portal, or finished white-label product. It gives you the Expo app structure and setup model that those products usually need.
+
+## Setup Models
+
+Tenkit calls the installed model the **Active Setup**. A cloned project has exactly one Active Setup at a time.
+
+| Setup Model                              | Use When                                                                                 | Status               |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------- | -------------------- |
+| **White Label Apps**                     | Every brand, customer, or venue ships as its own native app.                             | Default Active Setup |
+| **Single App Runtime Tenants**           | One native app opens multiple runtime business contexts.                                 | Local Scaffold       |
+| **Generic With Standalone App Variants** | One generic app opens selected tenants, while some tenants also ship as standalone apps. | Local Scaffold       |
+
+## How It Works
+
+Tenkit separates the app you build from the businesses or brands it can represent.
+
+| Concept            | Meaning                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| **Active Setup**   | The setup model currently installed in the root app.                                                               |
+| **App Variant**    | A build-time native app identity: app name, slug, scheme, bundle ID, package name, assets, theme, and EAS project. |
+| **Runtime Tenant** | A business, organization, customer, venue, or context opened at runtime.                                           |
+| **Scaffold**       | A local setup operation that rewrites setup-owned starter files.                                                   |
+| **Example**        | An opt-in reference that proves a setup model without being imported by the root app.                              |
+
+Build Preparation selects an App Variant. Runtime Tenant selection, when a setup uses tenants, remains an in-app runtime concern.
 
 ## Quick Start
 
@@ -58,49 +79,43 @@ cd tenkit
 
 ### 2. Use the project Node version
 
-Install `nvm` from the official nvm instructions, then run:
-
 ```bash
 nvm install
 nvm use
 ```
 
-### 3. Install pnpm
+### 3. Install dependencies
 
-Use pnpm for package scripts and dependency management in this repo. Do not use npm, Yarn, or Bun for local setup, scripts, or dependency changes.
+Tenkit uses pnpm for package scripts and dependency management.
 
 ```bash
 corepack enable pnpm
-pnpm --version
-```
-
-### 4. Install dependencies
-
-```bash
 pnpm install
 ```
 
-### 5. Configure the local App Variant
+### 4. Choose a local app variant
 
-Create `.env.local` from the example file:
+Create `.env.local`:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Set `APP_VARIANT_SLUG` to one of the accepted App Variant Slugs:
+Set `APP_VARIANT_SLUG` to one of the default app variants:
 
 ```bash
 APP_VARIANT_SLUG=first-tenant
 ```
 
-You can also use:
+or:
 
 ```bash
 APP_VARIANT_SLUG=second-tenant
 ```
 
-### 6. Start the app
+If `APP_VARIANT_SLUG` is omitted, Tenkit uses the default App Variant from `src/active-setup/manifest.ts`.
+
+### 5. Start the app
 
 ```bash
 pnpm run start
@@ -110,7 +125,7 @@ Expo CLI will show options for opening the app in a development build, Android e
 
 ## Common Workflows
 
-### Run the selected App Variant locally
+### Run the selected variant locally
 
 ```bash
 pnpm run ios
@@ -118,19 +133,19 @@ pnpm run android
 pnpm run web
 ```
 
-These commands use the App Variant already present in `.env.local`. They do not pull EAS env vars or regenerate native projects.
+These commands use the App Variant already present in `.env.local`. They do not pull EAS environment variables or regenerate native projects.
 
-### Prepare native projects
+### Prepare native projects for a variant
 
-Run Build Preparation after changing App Variant, App Variant Environment, native identity, package name, scheme, icons, splash assets, or plugin config:
+Use Build Preparation after changing App Variant, native identity, package name, scheme, icons, splash assets, plugin config, or App Variant Environment.
 
 ```bash
 pnpm tenkit build
 ```
 
-The command prompts for App Variant when the Active Setup has more than one App Variant, then prompts for platform and App Variant Environment. It pulls EAS env vars first, validates that `.env.local` contains the selected `APP_VARIANT_SLUG`, then runs clean Expo prebuild.
+The command prompts for App Variant, platform, and environment when needed. It pulls EAS environment variables, validates that `.env.local` contains the selected `APP_VARIANT_SLUG`, then runs clean Expo prebuild.
 
-CI/non-interactive examples:
+Non-interactive examples:
 
 ```bash
 pnpm tenkit build --slug second-tenant --env development --platform ios
@@ -144,76 +159,86 @@ pnpm tenkit build --slug second-tenant --env production --both
 pnpm tenkit reset
 ```
 
-Reset uses the Active Setup default App Variant, the `development` App Variant Environment, and both platforms. It never switches Active Setup, undoes a Scaffold, or rolls back setup-owned files.
+Reset uses the Active Setup default App Variant, the `development` App Variant Environment, and both platforms. It does not switch Active Setup, undo a Scaffold, or roll back setup-owned files.
 
-### Scaffold Single App Runtime Tenants
-
-Inspect the file plan first:
-
-```bash
-pnpm tenkit setup --setup-type single-app-runtime-tenants --dry-run --yes
-```
-
-Apply it explicitly:
-
-```bash
-pnpm tenkit setup --setup-type single-app-runtime-tenants --yes --force
-```
-
-The Scaffold writes setup-owned Active Setup files:
-
-- `src/active-setup/manifest.ts`
-- `src/active-setup/runtime-tenants.ts`
-
-It does not modify shared app entry points, native assets, EAS project state, local env files, or native `ios/` and `android/` directories. Starter values are intentionally generated as editable local data rather than prompted one field at a time.
-
-### Scaffold Generic With Standalone App Variants
-
-Inspect the file plan first:
-
-```bash
-pnpm tenkit setup --setup-type generic-with-standalone-app-variants --dry-run --yes
-```
-
-Apply it explicitly:
-
-```bash
-pnpm tenkit setup --setup-type generic-with-standalone-app-variants --yes --force
-```
-
-This Scaffold writes the same setup-owned Active Setup files:
-
-- `src/active-setup/manifest.ts`
-- `src/active-setup/runtime-tenants.ts`
-
-The generated Starter Data includes `Atlas Network` as the Generic App Variant. Its Runtime Tenant Access allows `North Studio`, `South Studio`, and `East Studio`. `West Studio` remains a Runtime Tenant, but it is opened by its own Standalone App Variant and is excluded from the generic picker.
-
-In this Setup Type, `runtimeTenants` means all known business contexts for the Active Setup. App Variant access decides which Runtime Tenants each installed app can open. A Generic App Variant uses selectable Runtime Tenant Access; a Standalone App Variant opens its direct Runtime Tenant.
-
-The Scaffold does not write, copy, or generate assets. Native assets are expected under the existing Slug-based convention:
-
-- `assets/atlas-network/...`
-- `assets/west-studio/...`
-
-### Doctor
+### Check the setup
 
 ```bash
 pnpm tenkit doctor
 ```
 
+## Current Default Setup
+
+White Label Apps is installed by default.
+
+| App Variant ID | Slug            | App Name        | Accent    | Native IDs                         |
+| -------------- | --------------- | --------------- | --------- | ---------------------------------- |
+| `1`            | `first-tenant`  | `First Tenant`  | `#208AEF` | `com.brilliantinsane.firsttenant`  |
+| `2`            | `second-tenant` | `Second Tenant` | `#ef8520` | `com.brilliantinsane.secondtenant` |
+
+The default setup lives in `src/active-setup/manifest.ts`.
+
+## Scaffold Another Setup Model
+
+Scaffolds rewrite setup-owned Active Setup files:
+
+- `src/active-setup/manifest.ts`
+- `src/active-setup/runtime-tenants.ts`
+
+They do not modify shared app entry points, native projects, EAS project state, or local environment files.
+
+### Single App Runtime Tenants
+
+Inspect the file plan:
+
+```bash
+pnpm tenkit setup --setup-type single-app-runtime-tenants --dry-run --yes
+```
+
+Apply it:
+
+```bash
+pnpm tenkit setup --setup-type single-app-runtime-tenants --yes --force
+```
+
+This setup models one native app that can open multiple Runtime Tenants inside the same installed app.
+
+### Generic With Standalone App Variants
+
+Inspect the file plan:
+
+```bash
+pnpm tenkit setup --setup-type generic-with-standalone-app-variants --dry-run --yes
+```
+
+Apply it:
+
+```bash
+pnpm tenkit setup --setup-type generic-with-standalone-app-variants --yes --force
+```
+
+The starter data includes `Atlas Network` as the Generic App Variant. It can open `North Studio`, `South Studio`, and `East Studio`. `West Studio` remains a Runtime Tenant, but it is opened by its own Standalone App Variant and is excluded from the generic picker.
+
+Native assets are expected under the existing slug-based convention:
+
+- `assets/atlas-network/...`
+- `assets/west-studio/...`
+
 ## EAS Setup
 
-Each App Variant maps to exactly one EAS Project. This open source starter intentionally keeps App Variant EAS Project IDs empty, so downstream apps must create or find their own EAS Projects first.
+Each App Variant maps to exactly one EAS Project.
+
+This starter intentionally keeps App Variant EAS Project IDs empty. Downstream apps must create or find their own EAS Projects first.
 
 For each App Variant:
 
-1. Log in with EAS CLI:
+1. Log in with EAS CLI.
 
    ```bash
    eas login
    ```
 
-2. Create or find one EAS Project in your Expo account or organization for the selected App Variant.
+2. Create or find one EAS Project in your Expo account or organization.
 3. Copy that EAS Project ID.
 4. Paste it into `src/active-setup/manifest.ts` at the App Variant's `eas.projectId`.
 5. Repeat for every App Variant you intend to build.
@@ -225,15 +250,15 @@ Optional helper:
 APP_VARIANT_SLUG=first-tenant eas init
 ```
 
-Use `eas init` only to create or discover the App Variant's EAS Project ID. If it prints a `projectId` and then exits with an error because this app uses dynamic config, copy the printed ID and paste it into the Active Setup Manifest.
+Use `eas init` only to create or discover an App Variant's EAS Project ID. If it prints a `projectId` and then exits with an error because this app uses dynamic config, copy the printed ID into the Active Setup Manifest.
 
 In each EAS Project, create environment variables for the EAS environments you use: `development`, `preview`, and `production`. Each environment must include `APP_VARIANT_SLUG`, and its value must match the App Variant Slug for that EAS Project.
 
-Never put `EAS_PROJECT_ID` in EAS environment variables. EAS Project IDs live in the Active Setup Manifest; they are public identifiers, not secrets.
+Do not put `EAS_PROJECT_ID` in EAS environment variables. EAS Project IDs live in the Active Setup Manifest; they are public identifiers, not secrets.
 
 ## Add An App Variant
 
-For the default White Label Apps Active Setup, update:
+For the default White Label Apps setup, update:
 
 - `src/active-setup/manifest.ts` to add the App Variant.
 - `assets/<slug>/icons/` with required Android and general icon assets.
@@ -245,28 +270,18 @@ Required asset paths are validated when dynamic Expo config resolves the selecte
 
 ```text
 .
-├── app.config.ts                         # Dynamic Expo config resolved from the Active Setup
-├── assets/
-│   ├── first-tenant/                     # Native assets for FirstTenant
-│   ├── second-tenant/                    # Native assets for SecondTenant
-│   └── acme-app/                         # Native starter assets for Single App Runtime Tenants
-├── examples/
-│   ├── generic-with-standalone-app-variants/ # Opt-in generic plus standalone reference
-│   └── single-app-runtime-tenants/       # Opt-in local-source reference example
-├── scripts/
-│   ├── tenkit-cli.ts                     # TypeScript CLI entrypoint
-│   ├── tenkit-cli-core.ts                # Build/reset planning and validation
-│   ├── tenkit-cli-runtime.ts             # EAS/env/prebuild execution
-│   ├── tenkit-setup-core.ts              # Setup file-plan generation and application
-│   └── tenkit-setup-runtime.ts           # Setup prompts and CLI runtime behavior
+├── app.config.ts                         # Dynamic Expo config
+├── assets/                               # Variant-specific native assets
+├── examples/                             # Opt-in setup model references
+├── scripts/                              # Tenkit CLI and setup runtime
 ├── src/
-│   ├── active-setup/                     # Installed Active Setup Manifest and runtime data
+│   ├── active-setup/                     # Installed setup manifest and runtime data
 │   ├── app/                              # Expo Router screens
 │   ├── hooks/                            # Runtime hooks
 │   ├── providers/                        # App providers
-│   ├── setup-types/                      # Shared Setup Type implementation
+│   ├── setup-types/                      # Shared setup model implementation
 │   └── utils/                            # Runtime config and accent helpers
-└── tests/                                # Active Setup, CLI, setup, and runtime tests
+└── tests/                                # Setup, CLI, config, and example tests
 ```
 
 ## Checks
@@ -279,20 +294,21 @@ pnpm typecheck
 pnpm lint
 ```
 
-Opt-in Single App Runtime Tenants example check:
+Example-specific checks:
 
 ```bash
 pnpm exec tsx --test examples/single-app-runtime-tenants/runtime-tenant-access.test.ts
-```
-
-Opt-in Generic With Standalone App Variants example check:
-
-```bash
 pnpm exec tsx --test examples/generic-with-standalone-app-variants/runtime-tenant-access.test.ts
 ```
 
-## Expo Docs
+## Expo SDK
 
-This repo targets Expo SDK 56. Read the exact versioned docs before changing Expo code:
+This repo targets Expo SDK 56.
+
+Read the exact versioned Expo docs before changing Expo code:
 
 https://docs.expo.dev/versions/v56.0.0/
+
+## License
+
+This repository includes an MIT license.
