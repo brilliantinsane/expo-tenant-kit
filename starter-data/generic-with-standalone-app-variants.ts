@@ -44,7 +44,7 @@ export const genericAppStarterData: GenericAppStarterData = {
         bundleIdentifier: 'com.example.weststudio',
         packageName: 'com.example.weststudio',
         theme: {
-          accent: '#EBE925',
+          accent: '#9A00CD',
         },
         eas: {
           projectId: '',
