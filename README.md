@@ -2,6 +2,11 @@
 
 ![Tenkit banner](apps/playground/assets/hero.png)
 
+<p align="center">
+  <a href="https://github.com/brilliantinsane/tenkit"><img alt="badge" src="https://shieldcn.dev/github/brilliantinsane/tenkit/stars.svg?variant=branded&amp;font=geist-mono&amp;logo=github" /></a>
+  <a href="https://x.com/brill_insane"><img alt="follow" src="https://shieldcn.dev/x/follow/brill_insane.svg?variant=branded&amp;font=geist" /></a>
+</p>
+
 Build and ship multiple Expo apps from one codebase.
 
 Tenkit is currently a pnpm monorepo shell with one runnable Expo **Playground** app in `apps/playground`. The Playground proves the setup model in a real app while future public CLI, web, and Template work stay out of this repository surface for now.
