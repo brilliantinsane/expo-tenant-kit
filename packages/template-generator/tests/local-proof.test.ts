@@ -55,6 +55,10 @@ test('local proof command boundary generates a White Label Apps Expo app in a se
     const appConfig = await fs.readFile(join(targetDir, 'app.config.ts'), 'utf8');
     const appVariantTypes = await fs.readFile(join(targetDir, 'src/types/app-variant.ts'), 'utf8');
     const appVariants = await fs.readFile(join(targetDir, 'src/constants/app-variants.ts'), 'utf8');
+    const projectConfig = await fs.readFile(
+      join(targetDir, 'src/constants/project-config.ts'),
+      'utf8',
+    );
     const appVariantHook = await fs.readFile(
       join(targetDir, 'src/hooks/use-app-variant-config.ts'),
       'utf8',
@@ -85,6 +89,8 @@ test('local proof command boundary generates a White Label Apps Expo app in a se
     assert.match(readme, /## Build Preparation/);
     assert.match(readme, /## Run the Prepared App/);
     assert.match(readme, /pnpm tenkit build/);
+    assert.match(readme, /EXPO_OWNER/);
+    assert.match(readme, /starts blank on purpose/);
     assert.ok(readme.indexOf('pnpm tenkit build') < readme.indexOf('pnpm ios'));
     assert.match(readme, /\.env\.example/);
     assert.match(envExample, /APP_VARIANT_SLUG=first-tenant/);
@@ -106,6 +112,8 @@ test('local proof command boundary generates a White Label Apps Expo app in a se
     assert.match(appVariantTypes, /AppVariantConfigExtra/);
     assert.match(appVariantHook, /AppVariantConfigExtra/);
     assert.doesNotMatch(appVariantHook, /'id' in/);
+    assert.match(projectConfig, /EXPO_OWNER = ''/);
+    assert.doesNotMatch(projectConfig, /brilliant-insane/);
     assert.match(appVariants, /satisfies readonly AppVariant\[\]/);
     assert.match(appVariants, /slug: 'first-tenant'/);
     assert.match(appVariants, /bundleIdentifier/);

@@ -18,6 +18,13 @@ export type WriteProjectResult = {
   filesSkipped: string[];
 };
 
+type WriteTarget = {
+  file: VirtualFile;
+  relativePath: string;
+  path: string;
+  outcome: 'written' | 'skipped';
+};
+
 function isWindowsAbsolutePath(path: string): boolean {
   return /^[A-Za-z]:[\\/]/.test(path);
 }
@@ -114,7 +121,7 @@ function assertNoDuplicatePaths(tree: VirtualFileTree) {
   }
 }
 
-async function writeVirtualFile({
+async function planVirtualFileWrite({
   file,
   targetDir,
   overwrite,
@@ -122,10 +129,16 @@ async function writeVirtualFile({
   file: VirtualFile;
   targetDir: string;
   overwrite: WriteProjectOverwriteMode;
-}): Promise<'written' | 'skipped'> {
+}): Promise<WriteTarget> {
   const target = resolveTargetPath(targetDir, file);
 
   if (await pathExists(target.path)) {
+    const targetStats = await fs.stat(target.path);
+
+    if (targetStats.isDirectory()) {
+      throw new Error(`Generated project file ${target.relativePath} exists as a directory.`);
+    }
+
     if (overwrite === 'never') {
       throw new Error(
         `Refusing to overwrite existing generated project file ${target.relativePath}. Use overwrite: "always" to replace it.`,
@@ -148,13 +161,16 @@ async function writeVirtualFile({
         );
       }
 
-      return 'skipped';
+      return { ...target, file, outcome: 'skipped' };
     }
   }
 
+  return { ...target, file, outcome: 'written' };
+}
+
+async function writeVirtualFile(target: WriteTarget): Promise<void> {
   await fs.ensureDir(dirname(target.path));
-  await fs.writeFile(target.path, file.contents);
-  return 'written';
+  await fs.writeFile(target.path, target.file.contents);
 }
 
 export async function writeProject(options: WriteProjectOptions): Promise<WriteProjectResult> {
@@ -164,17 +180,21 @@ export async function writeProject(options: WriteProjectOptions): Promise<WriteP
   assertTargetIsAllowed(options.targetDir, options.forbiddenTargetRoots);
   await assertTargetDirectory(options.targetDir);
 
+  const targets: WriteTarget[] = [];
+
+  for (const file of options.tree) {
+    targets.push(await planVirtualFileWrite({ file, targetDir: options.targetDir, overwrite }));
+  }
+
   const result: WriteProjectResult = {
     targetDir: resolve(options.targetDir),
     filesWritten: [],
     filesSkipped: [],
   };
 
-  for (const file of options.tree) {
-    const target = resolveTargetPath(options.targetDir, file);
-    const outcome = await writeVirtualFile({ file, targetDir: options.targetDir, overwrite });
-
-    if (outcome === 'written') {
+  for (const target of targets) {
+    if (target.outcome === 'written') {
+      await writeVirtualFile(target);
       result.filesWritten.push(target.relativePath);
     } else {
       result.filesSkipped.push(target.relativePath);

@@ -79,6 +79,7 @@ async function main() {
     const appConfig = await readText(join(targetDir, 'app.config.ts'));
     const appVariantTypes = await readText(join(targetDir, 'src/types/app-variant.ts'));
     const appVariants = await readText(join(targetDir, 'src/constants/app-variants.ts'));
+    const projectConfig = await readText(join(targetDir, 'src/constants/project-config.ts'));
     const appVariantHook = await readText(join(targetDir, 'src/hooks/use-app-variant-config.ts'));
     const resolver = await readText(join(targetDir, 'src/lib/resolve-app-variant-config.ts'));
     const tenkitCli = await readText(join(targetDir, 'scripts/tenkit-cli.ts'));
@@ -110,6 +111,8 @@ async function main() {
     assert.match(readme, /## Build Preparation/);
     assert.match(readme, /## Run the Prepared App/);
     assert.match(readme, /pnpm tenkit build/);
+    assert.match(readme, /EXPO_OWNER/);
+    assert.match(readme, /starts blank on purpose/);
     assert.ok(readme.indexOf('pnpm tenkit build') < readme.indexOf('pnpm ios'));
     assert.match(readme, /\.env\.example/);
     assert.match(envExample, /APP_VARIANT_SLUG=first-tenant/);
@@ -131,6 +134,8 @@ async function main() {
     assert.match(appVariantTypes, /AppVariantConfigExtra/);
     assert.match(appVariantHook, /AppVariantConfigExtra/);
     assert.doesNotMatch(appVariantHook, /'id' in/);
+    assert.match(projectConfig, /EXPO_OWNER = ''/);
+    assert.doesNotMatch(projectConfig, /brilliant-insane/);
     assert.match(appVariants, /satisfies readonly AppVariant\[\]/);
     assert.match(appVariants, /bundleIdentifier/);
     assert.match(appVariants, /slug: 'first-tenant'/);

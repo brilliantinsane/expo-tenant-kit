@@ -78,6 +78,32 @@ test('writer has explicit overwrite behavior for generated files', async () => {
   }
 });
 
+test('writer preflights existing file conflicts before writing generated files', async () => {
+  const targetDir = await createTempRoot();
+
+  try {
+    await fs.ensureDir(join(targetDir, '.vscode'));
+    await fs.writeFile(join(targetDir, 'package.json'), 'existing\n', 'utf8');
+
+    await assert.rejects(
+      () =>
+        writeProject({
+          targetDir,
+          tree: [
+            { path: '.vscode/settings.json', contents: '{}\n' },
+            { path: 'package.json', contents: '{}\n' },
+          ],
+        }),
+      /Refusing to overwrite/,
+    );
+
+    assert.equal(await fs.pathExists(join(targetDir, '.vscode/settings.json')), false);
+    assert.equal(await fs.readFile(join(targetDir, 'package.json'), 'utf8'), 'existing\n');
+  } finally {
+    await fs.remove(targetDir);
+  }
+});
+
 test('writer validates duplicate normalized generated paths before writing', async () => {
   assert.equal(validateVirtualFilePath('src/../README.md'), 'README.md');
 

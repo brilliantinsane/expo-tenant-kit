@@ -42,7 +42,7 @@ pnpm tenkit doctor
 
 Before using build preparation:
 
-1. Set `EXPO_OWNER` in `src/constants/project-config.ts`.
+1. Set `EXPO_OWNER` in `src/constants/project-config.ts` to your Expo account or organization. It starts blank on purpose, so build preparation fails clearly instead of using Tenkit's Expo account.
 2. Create or link an EAS Project for each App Variant.
 3. Paste each EAS Project ID into `src/constants/app-variants.ts`.
 4. Add `APP_VARIANT_SLUG` to each App Variant's EAS environment.

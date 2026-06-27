@@ -151,6 +151,8 @@ test('White Label Apps Template combines shared, setup-owned, and App Variant as
   assert.match(readVirtualFile(tree, 'README.md'), /## Build Preparation/);
   assert.match(readVirtualFile(tree, 'README.md'), /## Run the Prepared App/);
   assert.match(readVirtualFile(tree, 'README.md'), /pnpm tenkit build/);
+  assert.match(readVirtualFile(tree, 'README.md'), /EXPO_OWNER/);
+  assert.match(readVirtualFile(tree, 'README.md'), /starts blank on purpose/);
   assert.ok(
     readVirtualFile(tree, 'README.md').indexOf('pnpm tenkit build') <
       readVirtualFile(tree, 'README.md').indexOf('pnpm ios'),
@@ -190,6 +192,8 @@ test('White Label Apps Template combines shared, setup-owned, and App Variant as
   );
   assert.match(readVirtualFile(tree, 'src/constants/app-variants.ts'), /bundleIdentifier/);
   assert.match(readVirtualFile(tree, 'src/constants/app-variants.ts'), /slug: 'first-tenant'/);
+  assert.match(readVirtualFile(tree, 'src/constants/project-config.ts'), /EXPO_OWNER = ''/);
+  assert.doesNotMatch(readVirtualFile(tree, 'src/constants/project-config.ts'), /brilliant-insane/);
   assert.match(
     readVirtualFile(tree, 'src/lib/resolve-app-variant-config.ts'),
     /Missing required App Variant asset/,
