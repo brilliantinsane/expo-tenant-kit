@@ -117,9 +117,15 @@ async function main() {
     }
   }
 
-  const committed = await tryCommitInitialGitSnapshot(result.targetDir);
+  if (!result.gitInitialized) {
+    console.log('Initial git repository was skipped. Initialize git and commit when ready.');
+  }
 
-  if (!committed) {
+  const committed = result.gitInitialized
+    ? await tryCommitInitialGitSnapshot(result.targetDir)
+    : false;
+
+  if (result.gitInitialized && !committed) {
     console.log('Initial git commit was skipped. Configure git identity and commit when ready.');
   }
 

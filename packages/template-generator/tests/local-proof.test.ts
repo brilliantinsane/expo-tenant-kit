@@ -76,6 +76,8 @@ test('local proof command boundary generates a White Label Apps Expo app in a se
     const pnpmWorkspace = await fs.readFile(join(targetDir, 'pnpm-workspace.yaml'), 'utf8');
 
     assert.ok(result.filesWritten.includes('package.json'));
+    assert.equal(result.gitInitialized, true);
+    assert.equal(result.gitCommitted, false);
     assert.equal(packageJson.name, 'tenkit-white-label-app');
     assert.equal(packageJson.private, true);
     assert.equal(packageJson.scripts?.start, 'expo start');
@@ -188,6 +190,28 @@ test('local proof command boundary generates a White Label Apps Expo app in a se
     assert.equal(await exists(join(targetDir, '.git/HEAD')), true);
     assert.equal(await readGitStatus(targetDir), '');
     assert.equal(await exists(join(workspaceRoot, 'package.json')), false);
+  } finally {
+    await fs.remove(tempRoot);
+  }
+});
+
+test('local proof command boundary keeps generated files when Git initialization is unavailable', async () => {
+  const tempRoot = await fs.mkdtemp(join(tmpdir(), 'tenkit-template-proof-'));
+  const targetDir = join(tempRoot, 'generated-app');
+
+  try {
+    await fs.ensureDir(targetDir);
+    await fs.writeFile(join(targetDir, '.git'), 'not a valid git file\n', 'utf8');
+
+    const result = await runWhiteLabelGenerationProof({
+      targetDir,
+      git: 'init',
+    });
+
+    assert.equal(result.gitInitialized, false);
+    assert.equal(result.gitCommitted, false);
+    assert.equal(await exists(join(targetDir, 'package.json')), true);
+    assert.equal(await exists(join(targetDir, '.git/HEAD')), false);
   } finally {
     await fs.remove(tempRoot);
   }

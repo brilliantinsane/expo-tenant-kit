@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 import { resolve } from 'pathe';
 
 import { generateWhiteLabelAppsProject } from './generator';
-import { writeProject, type WriteProjectOverwriteMode } from './writer';
+import { writeProject, type WriteProjectOverwriteMode, type WriteProjectResult } from './writer';
 
 export type GeneratedProjectGitMode = false | 'init' | 'commit';
 
@@ -14,6 +14,11 @@ export type RunWhiteLabelGenerationProofOptions = {
   projectName?: string;
   packageName?: string;
   workspaceRoot?: string;
+};
+
+export type RunWhiteLabelGenerationProofResult = WriteProjectResult & {
+  gitInitialized: boolean;
+  gitCommitted: boolean;
 };
 
 function runGitInit(cwd: string): Promise<void> {
@@ -62,6 +67,15 @@ export async function commitInitialGitSnapshot(targetDir: string) {
   ]);
 }
 
+export async function tryInitializeGitRepository(targetDir: string): Promise<boolean> {
+  try {
+    await runGitInit(targetDir);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function tryCommitInitialGitSnapshot(targetDir: string): Promise<boolean> {
   try {
     await commitInitialGitSnapshot(targetDir);
@@ -71,7 +85,9 @@ export async function tryCommitInitialGitSnapshot(targetDir: string): Promise<bo
   }
 }
 
-export async function runWhiteLabelGenerationProof(options: RunWhiteLabelGenerationProofOptions) {
+export async function runWhiteLabelGenerationProof(
+  options: RunWhiteLabelGenerationProofOptions,
+): Promise<RunWhiteLabelGenerationProofResult> {
   const tree = generateWhiteLabelAppsProject({
     setupType: 'white-label-apps',
     projectName: options.projectName,
@@ -86,14 +102,20 @@ export async function runWhiteLabelGenerationProof(options: RunWhiteLabelGenerat
     forbiddenTargetRoots: options.workspaceRoot ? [options.workspaceRoot] : [],
   });
   const gitMode = normalizeGitMode(options.git);
+  let gitInitialized = false;
+  let gitCommitted = false;
 
   if (gitMode) {
-    await runGitInit(result.targetDir);
+    gitInitialized = await tryInitializeGitRepository(result.targetDir);
 
-    if (gitMode === 'commit') {
-      await commitInitialGitSnapshot(result.targetDir);
+    if (gitInitialized && gitMode === 'commit') {
+      gitCommitted = await tryCommitInitialGitSnapshot(result.targetDir);
     }
   }
 
-  return result;
+  return {
+    ...result,
+    gitInitialized,
+    gitCommitted,
+  };
 }
