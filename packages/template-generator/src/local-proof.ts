@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 
+import fs from 'fs-extra';
 import { resolve } from 'pathe';
 
 import { generateWhiteLabelAppsProject } from './generator';
@@ -19,6 +20,7 @@ export type RunWhiteLabelGenerationProofOptions = {
 export type RunWhiteLabelGenerationProofResult = WriteProjectResult & {
   gitInitialized: boolean;
   gitCommitted: boolean;
+  gitSkippedBecauseTargetWasNotEmpty: boolean;
 };
 
 function runGitInit(cwd: string): Promise<void> {
@@ -58,6 +60,20 @@ function normalizeGitMode(
   return 'commit';
 }
 
+async function isExistingTargetDirectoryEmpty(targetDir: string): Promise<boolean> {
+  if (!(await fs.pathExists(targetDir))) {
+    return true;
+  }
+
+  const targetStats = await fs.stat(targetDir);
+
+  if (!targetStats.isDirectory()) {
+    return false;
+  }
+
+  return (await fs.readdir(targetDir)).length === 0;
+}
+
 export async function commitInitialGitSnapshot(targetDir: string) {
   await runGit(targetDir, ['add', '--all']);
   await runGit(targetDir, [
@@ -94,6 +110,7 @@ export async function runWhiteLabelGenerationProof(
     packageName: options.packageName,
   });
   const overwrite: WriteProjectOverwriteMode = options.force ? 'always' : 'never';
+  const targetWasEmpty = await isExistingTargetDirectoryEmpty(options.targetDir);
 
   const result = await writeProject({
     targetDir: options.targetDir,
@@ -104,8 +121,9 @@ export async function runWhiteLabelGenerationProof(
   const gitMode = normalizeGitMode(options.git);
   let gitInitialized = false;
   let gitCommitted = false;
+  const gitSkippedBecauseTargetWasNotEmpty = Boolean(gitMode && !targetWasEmpty);
 
-  if (gitMode) {
+  if (gitMode && targetWasEmpty) {
     gitInitialized = await tryInitializeGitRepository(result.targetDir);
 
     if (gitInitialized && gitMode === 'commit') {
@@ -117,5 +135,6 @@ export async function runWhiteLabelGenerationProof(
     ...result,
     gitInitialized,
     gitCommitted,
+    gitSkippedBecauseTargetWasNotEmpty,
   };
 }

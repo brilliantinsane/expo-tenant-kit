@@ -118,7 +118,11 @@ async function main() {
   }
 
   if (!result.gitInitialized) {
-    console.log('Initial git repository was skipped. Initialize git and commit when ready.');
+    if (result.gitSkippedBecauseTargetWasNotEmpty) {
+      console.log('Initial git repository was skipped because the target folder was not empty.');
+    } else {
+      console.log('Initial git repository was skipped. Initialize git and commit when ready.');
+    }
   }
 
   const committed = result.gitInitialized

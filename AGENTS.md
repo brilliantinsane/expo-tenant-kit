@@ -142,6 +142,7 @@ Tenkit-specific boundaries:
 - Generated-output proof must run against a fresh generated app folder outside the Tenkit workspace, not the Playground or any monorepo package folder.
 - Verification should cover generated project shape, dependency installation where practical, TypeScript, and Expo config evaluation.
 - Local Template proof commands may intentionally model future create-CLI behavior by writing files, installing dependencies, and initializing an initial git snapshot where possible. Convenience failures in install or git setup must not hide generation errors or mutate the Playground or Tenkit workspace.
+- The future public CLI should own the full create-flow policy, including prompts, non-empty target handling, dependency installation, and initial Git snapshot behavior. Keep local proof commands minimal and explicit.
 - Future generated Setup Type Templates should be siblings of `white-label/`. Do not introduce a durable `base-expo` layer unless a new architecture decision explicitly adopts it.
 
 ## Code Organization
