@@ -110,6 +110,7 @@ async function main() {
     assert.equal(packageJson.scripts?.['expo:config'], 'expo config --type public');
     assert.equal(packageJson.dependencies?.expo, '~56.0.12');
     assert.equal(packageJson.dependencies?.['expo-dev-client'], '~56.0.19');
+    assert.equal(packageJson.dependencies?.['expo-linking'], '~56.0.14');
     assert.equal(packageJson.dependencies?.['expo-router'], '~56.2.11');
     assert.equal(packageJson.dependencies?.['expo-splash-screen'], '~56.0.10');
     assert.equal(packageJson.dependencies?.['expo-system-ui'], '~56.0.5');
