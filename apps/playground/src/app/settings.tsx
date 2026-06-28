@@ -1,12 +1,13 @@
 import { ThemedView } from '@/components/ui/themed-view';
 import { globalStyles } from '@/constants/globals';
 import { useActiveRuntimeTenant } from '@/hooks/use-active-runtime-tenant';
-import { useTheme } from '@/hooks/use-theme';
-import { FieldGroup, Host, Picker, Row, Spacer, Switch, Text } from '@expo/ui';
+import { useTheme } from '@/theme/ThemeContext';
+import { FieldGroup, Host, Picker, Row, Spacer, Text } from '@expo/ui';
 import { scrollContentBackground } from '@expo/ui/swift-ui/modifiers';
 
 const SettingsScreen = () => {
-  const { colors, scheme, setScheme } = useTheme();
+  const { colors, dark } = useTheme();
+  const colorScheme = dark ? 'dark' : 'light';
   const {
     activeRuntimeTenantId,
     allowedRuntimeTenantIds,
@@ -16,25 +17,13 @@ const SettingsScreen = () => {
 
   return (
     <ThemedView style={[globalStyles.container]}>
-      <Host style={{ flex: 1 }} colorScheme={scheme}>
+      <Host style={{ flex: 1 }} colorScheme={colorScheme}>
         <FieldGroup
           style={{
             backgroundColor: colors.background,
           }}
           modifiers={[scrollContentBackground('hidden')]}
         >
-          <Row alignment="center">
-            <Text>Dark appearance</Text>
-
-            <Spacer flexible />
-
-            <Switch
-              value={scheme === 'dark'}
-              onValueChange={(value) => {
-                setScheme(value ? 'dark' : 'light');
-              }}
-            />
-          </Row>
           {hasRuntimeTenantSelection && activeRuntimeTenantId ? (
             <Row alignment="center">
               <Text>Active tenant</Text>
