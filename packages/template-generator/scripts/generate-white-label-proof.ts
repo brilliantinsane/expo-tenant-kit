@@ -105,7 +105,7 @@ async function main() {
     git: 'init',
     projectName: args.projectName,
     packageName: args.packageName,
-    playgroundDir: resolve(workspaceRoot, 'apps/playground'),
+    workspaceRoot,
   });
 
   if (args.install) {

@@ -77,7 +77,7 @@ async function main() {
       targetDir,
       git: 'init',
       projectName: 'ACME <Pilot> {One}',
-      playgroundDir: resolve(workspaceRoot, 'apps/playground'),
+      workspaceRoot,
     });
     await configureTestGitIdentity(targetDir);
     await commitInitialGitSnapshot(targetDir);

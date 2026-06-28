@@ -139,9 +139,9 @@ Tenkit-specific boundaries:
 - Template layers must not silently overwrite the same output path. If `shared/` and a selected Template both want the same file, first choose one owner. Add an explicit override boundary only when the override is intentional, documented, and tested.
 - Keep writing separate: the writer owns path validation, overwrite behavior, and filesystem persistence.
 - Writer changes need negative tests for unsafe paths, duplicate normalized paths, overwrite behavior, and target-folder safety.
-- Generated-output proof must run against a fresh generated app folder, not the Playground.
+- Generated-output proof must run against a fresh generated app folder outside the Tenkit workspace, not the Playground or any monorepo package folder.
 - Verification should cover generated project shape, dependency installation where practical, TypeScript, and Expo config evaluation.
-- Local Template proof commands may intentionally model future create-CLI behavior by writing files, installing dependencies, and initializing an initial git snapshot where possible. Convenience failures in install or git setup must not hide generation errors or mutate the Playground.
+- Local Template proof commands may intentionally model future create-CLI behavior by writing files, installing dependencies, and initializing an initial git snapshot where possible. Convenience failures in install or git setup must not hide generation errors or mutate the Playground or Tenkit workspace.
 - Future generated Setup Type Templates should be siblings of `white-label/`. Do not introduce a durable `base-expo` layer unless a new architecture decision explicitly adopts it.
 
 ## Code Organization

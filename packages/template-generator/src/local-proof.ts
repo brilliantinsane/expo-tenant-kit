@@ -13,7 +13,7 @@ export type RunWhiteLabelGenerationProofOptions = {
   git?: boolean | GeneratedProjectGitMode;
   projectName?: string;
   packageName?: string;
-  playgroundDir?: string;
+  workspaceRoot?: string;
 };
 
 function runGitInit(cwd: string): Promise<void> {
@@ -83,7 +83,7 @@ export async function runWhiteLabelGenerationProof(options: RunWhiteLabelGenerat
     targetDir: options.targetDir,
     tree,
     overwrite,
-    forbiddenTargetRoots: options.playgroundDir ? [options.playgroundDir] : [],
+    forbiddenTargetRoots: options.workspaceRoot ? [options.workspaceRoot] : [],
   });
   const gitMode = normalizeGitMode(options.git);
 

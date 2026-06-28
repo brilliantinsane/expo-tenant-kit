@@ -187,7 +187,7 @@ The `tenkit` command is Playground-only local tooling for Scaffold, Build Prepar
 
 ### Generate the Template proof
 
-The private Template generator can render a fresh White Label Apps Expo project into a separate folder. This is proof tooling for the future public create flow, not the public CLI surface.
+The private Template generator can render a fresh White Label Apps Expo project into a separate folder. This is proof tooling for the future public create flow, not the public CLI surface. Future Templates should use this local proof harness until the real npm-published CLI exists; after that, local verification should exercise the actual CLI from the workspace or a packed package.
 
 ```bash
 pnpm generate:white-label-proof -- --target ../tenkit-white-label-proof

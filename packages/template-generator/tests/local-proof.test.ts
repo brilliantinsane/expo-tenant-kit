@@ -36,13 +36,13 @@ async function configureTestGitIdentity(cwd: string): Promise<void> {
 test('local proof command boundary generates a White Label Apps Expo app in a separate folder', async () => {
   const tempRoot = await fs.mkdtemp(join(tmpdir(), 'tenkit-template-proof-'));
   const targetDir = join(tempRoot, 'generated-app');
-  const playgroundDir = join(tempRoot, 'playground');
+  const workspaceRoot = join(tempRoot, 'tenkit-workspace');
 
   try {
     const result = await runWhiteLabelGenerationProof({
       targetDir,
       git: 'init',
-      playgroundDir,
+      workspaceRoot,
     });
     await configureTestGitIdentity(targetDir);
     await commitInitialGitSnapshot(targetDir);
@@ -187,22 +187,22 @@ test('local proof command boundary generates a White Label Apps Expo app in a se
     );
     assert.equal(await exists(join(targetDir, '.git/HEAD')), true);
     assert.equal(await readGitStatus(targetDir), '');
-    assert.equal(await exists(join(playgroundDir, 'package.json')), false);
+    assert.equal(await exists(join(workspaceRoot, 'package.json')), false);
   } finally {
     await fs.remove(tempRoot);
   }
 });
 
-test('local proof command boundary refuses to generate into the Playground', async () => {
+test('local proof command boundary refuses to generate inside the Tenkit workspace', async () => {
   const tempRoot = await fs.mkdtemp(join(tmpdir(), 'tenkit-template-proof-'));
-  const playgroundDir = join(tempRoot, 'apps/playground');
+  const workspaceRoot = join(tempRoot, 'tenkit-workspace');
 
   try {
     await assert.rejects(
       () =>
         runWhiteLabelGenerationProof({
-          targetDir: join(playgroundDir, 'generated'),
-          playgroundDir,
+          targetDir: join(workspaceRoot, 'packages/proof'),
+          workspaceRoot,
         }),
       /protected project root/,
     );
