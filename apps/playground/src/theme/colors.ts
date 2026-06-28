@@ -18,7 +18,26 @@ export type SystemColors = { [K in SystemColorKey]: string };
 // The native palette per platform. iOS uses system labels/backgrounds; Android
 // uses Material You dynamic tokens (they recolor with the user's wallpaper).
 // `default` is the web/fallback palette for anything that isn't iOS or Android.
-function getNativeDefault(key: SystemColorKey): ColorValue {
+function getNativeDefault(key: SystemColorKey, colorScheme: string | null | undefined): ColorValue {
+  const fallbackPalette =
+    colorScheme === 'dark'
+      ? {
+          background: '#000000',
+          secondaryBackground: '#1C1C1E',
+          text: '#FFFFFF',
+          secondaryText: '#AEAEB2',
+          separator: '#38383A',
+          link: '#0A84FF',
+        }
+      : {
+          background: '#FFFFFF',
+          secondaryBackground: '#F2F2F7',
+          text: '#000000',
+          secondaryText: '#666666',
+          separator: '#E0E0E0',
+          link: '#007AFF',
+        };
+
   const defaults: Record<SystemColorKey, ColorValue> = Platform.select({
     ios: {
       background: Color.ios.systemBackground,
@@ -36,36 +55,25 @@ function getNativeDefault(key: SystemColorKey): ColorValue {
       separator: Color.android.dynamic.outlineVariant,
       link: Color.android.dynamic.primary,
     },
-    default: {
-      background: '#FFFFFF',
-      secondaryBackground: '#F2F2F7',
-      text: '#000000',
-      secondaryText: '#666666',
-      separator: '#E0E0E0',
-      link: '#007AFF',
-    },
+    default: fallbackPalette,
   })!;
   return defaults[key];
 }
 
-// Non-hook accessor. Use this outside React (toasts, navigation theme, etc.).
-export function getSystemColor(key: SystemColorKey): ColorValue {
+// Non-hook accessor. Pass colorScheme when dark/light matters outside React.
+export function getSystemColor(key: SystemColorKey, colorScheme?: string | null): ColorValue {
   const value = themeConfig.system[key];
-  return value === 'native' ? getNativeDefault(key) : value;
+  return value === 'native' ? getNativeDefault(key, colorScheme) : value;
 }
 
-// We accept colorScheme even though we don't read it: passing it makes the
-// dark/light value an explicit dependency, so the React Compiler (and plain
-// React) recompute these colors when the user flips the theme. Without this,
-// a memoized result would hand back stale colors after a toggle.
-function resolveSystemColors(_colorScheme: string | null | undefined): SystemColors {
+function resolveSystemColors(colorScheme: string | null | undefined): SystemColors {
   return {
-    background: getSystemColor('background') as string,
-    secondaryBackground: getSystemColor('secondaryBackground') as string,
-    text: getSystemColor('text') as string,
-    secondaryText: getSystemColor('secondaryText') as string,
-    separator: getSystemColor('separator') as string,
-    link: getSystemColor('link') as string,
+    background: getSystemColor('background', colorScheme) as string,
+    secondaryBackground: getSystemColor('secondaryBackground', colorScheme) as string,
+    text: getSystemColor('text', colorScheme) as string,
+    secondaryText: getSystemColor('secondaryText', colorScheme) as string,
+    separator: getSystemColor('separator', colorScheme) as string,
+    link: getSystemColor('link', colorScheme) as string,
   };
 }
 
@@ -126,15 +134,17 @@ export function useBrandColors(): ResolvedBrand {
 export function getNavigationTheme(dark: boolean, primaryOverride?: string): Theme {
   const base = dark ? DarkTheme : DefaultTheme;
   const primary = primaryOverride ?? getBrandColors(dark).primary;
+  const colorScheme = dark ? 'dark' : 'light';
+
   return {
     ...base,
     colors: {
       ...base.colors,
       primary,
-      background: getSystemColor('background') as string,
-      card: getSystemColor('secondaryBackground') as string,
-      text: getSystemColor('text') as string,
-      border: getSystemColor('separator') as string,
+      background: getSystemColor('background', colorScheme) as string,
+      card: getSystemColor('secondaryBackground', colorScheme) as string,
+      text: getSystemColor('text', colorScheme) as string,
+      border: getSystemColor('separator', colorScheme) as string,
       notification: primary,
     },
   };

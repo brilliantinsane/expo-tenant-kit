@@ -92,6 +92,7 @@ async function main() {
     const projectConfig = await readText(join(targetDir, 'src/constants/project-config.ts'));
     const appVariantHook = await readText(join(targetDir, 'src/hooks/use-app-variant-config.ts'));
     const resolver = await readText(join(targetDir, 'src/lib/resolve-app-variant-config.ts'));
+    const themeColors = await readText(join(targetDir, 'src/theme/colors.ts'));
     const tenkitCli = await readText(join(targetDir, 'scripts/tenkit-cli.ts'));
     const tenkitCliCore = await readText(join(targetDir, 'scripts/tenkit-cli-core.ts'));
     const tenkitCliRuntime = await readText(join(targetDir, 'scripts/tenkit-cli-runtime.ts'));
@@ -117,6 +118,8 @@ async function main() {
     assert.equal(packageJson.devDependencies?.['@inquirer/prompts'], '^8.5.2');
     assert.equal(packageJson.devDependencies?.['@expo/config-types'], '56.0.6');
     assert.equal(packageJson.devDependencies?.commander, '^15.0.0');
+    assert.match(themeColors, /getSystemColor\('background', colorScheme\)/);
+    assert.match(themeColors, /background: '#000000'/);
     assert.match(readme, /## Highlights/);
     assert.match(readme, /## Get Started/);
     assert.match(readme, /## Select an App Variant/);

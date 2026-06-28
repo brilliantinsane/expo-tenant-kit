@@ -145,6 +145,11 @@ test('White Label Apps Template combines shared, setup-owned, and App Variant as
   assert.equal(packageJson.scripts.ios, 'expo run:ios');
   assert.equal(packageJson.scripts.web, 'expo start --web');
   assert.equal(packageJson.scripts['expo:config'], 'expo config --type public');
+  assert.match(
+    readVirtualFile(tree, 'src/theme/colors.ts'),
+    /getSystemColor\('background', colorScheme\)/,
+  );
+  assert.match(readVirtualFile(tree, 'src/theme/colors.ts'), /background: '#000000'/);
   assert.match(readVirtualFile(tree, 'README.md'), /A Tenkit White Label Apps project/);
   assert.match(readVirtualFile(tree, 'README.md'), /## Highlights/);
   assert.match(readVirtualFile(tree, 'README.md'), /## Get Started/);
