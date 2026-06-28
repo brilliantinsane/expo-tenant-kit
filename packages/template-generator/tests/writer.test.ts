@@ -170,6 +170,28 @@ test('writer validates duplicate normalized generated paths before writing', asy
   }
 });
 
+test('writer rejects generated file and descendant path collisions before writing', async () => {
+  const targetDir = await createTempRoot();
+
+  try {
+    await assert.rejects(
+      () =>
+        writeProject({
+          targetDir,
+          tree: [
+            { path: 'README.md', contents: 'generated\n' },
+            { path: 'README.md/extra', contents: 'nested\n' },
+          ],
+        }),
+      /conflicts with descendant path/,
+    );
+
+    assert.equal(await fs.pathExists(join(targetDir, 'README.md')), false);
+  } finally {
+    await fs.remove(targetDir);
+  }
+});
+
 test('writer rejects targets inside protected project roots', async () => {
   const tempRoot = await createTempRoot();
   const playgroundDir = join(tempRoot, 'apps/playground');
@@ -187,6 +209,47 @@ test('writer rejects targets inside protected project roots', async () => {
     );
 
     assert.equal(await fs.pathExists(join(targetDir, 'package.json')), false);
+  } finally {
+    await fs.remove(tempRoot);
+  }
+});
+
+test('writer rejects targets that resolve into protected project roots through symlinks', async (t) => {
+  const tempRoot = await createTempRoot();
+  const playgroundDir = join(tempRoot, 'apps/playground');
+  const linkedPlaygroundDir = join(tempRoot, 'linked-playground');
+  const targetDir = join(linkedPlaygroundDir, 'generated-app');
+
+  try {
+    await fs.ensureDir(playgroundDir);
+
+    try {
+      await fs.symlink(playgroundDir, linkedPlaygroundDir, 'dir');
+    } catch (error) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        ['EPERM', 'EACCES'].includes(String(error.code))
+      ) {
+        t.skip('filesystem does not allow creating directory symlinks');
+        return;
+      }
+
+      throw error;
+    }
+
+    await assert.rejects(
+      () =>
+        writeProject({
+          targetDir,
+          tree: [{ path: 'package.json', contents: '{}\n' }],
+          forbiddenTargetRoots: [playgroundDir],
+        }),
+      /protected project root/,
+    );
+
+    assert.equal(await fs.pathExists(join(playgroundDir, 'generated-app/package.json')), false);
   } finally {
     await fs.remove(tempRoot);
   }

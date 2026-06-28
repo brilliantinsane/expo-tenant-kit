@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { dirname, isAbsolute, normalize, resolve, sep } from 'pathe';
+import { basename, dirname, isAbsolute, normalize, resolve, sep } from 'pathe';
 
 import { type VirtualFile, type VirtualFileTree } from './virtual-file-tree';
 
@@ -95,12 +95,28 @@ async function assertTargetDirectory(targetDir: string) {
   }
 }
 
-async function resolveRealTargetDir(targetDir: string): Promise<string> {
-  if (await pathExists(targetDir)) {
-    return fs.realpath(targetDir);
+async function resolvePathThroughExistingAncestors(path: string): Promise<string> {
+  const absolutePath = resolve(path);
+
+  if (await pathExists(absolutePath)) {
+    return fs.realpath(absolutePath);
   }
 
-  return resolve(targetDir);
+  const missingSegments: string[] = [];
+  let existingAncestor = absolutePath;
+
+  while (!(await pathExists(existingAncestor))) {
+    const parent = dirname(existingAncestor);
+
+    if (parent === existingAncestor) {
+      return absolutePath;
+    }
+
+    missingSegments.unshift(basename(existingAncestor));
+    existingAncestor = parent;
+  }
+
+  return resolve(await fs.realpath(existingAncestor), ...missingSegments);
 }
 
 async function assertWritableParentsStayInsideTarget({
@@ -116,7 +132,7 @@ async function assertWritableParentsStayInsideTarget({
     return;
   }
 
-  const realTargetDir = await resolveRealTargetDir(targetDir);
+  const realTargetDir = await resolvePathThroughExistingAncestors(targetDir);
   let currentPath = resolve(targetDir);
 
   for (const segment of parentPath.split('/')) {
@@ -156,9 +172,16 @@ async function assertWritableParentsStayInsideTarget({
   }
 }
 
-function assertTargetIsAllowed(targetDir: string, forbiddenTargetRoots: readonly string[] = []) {
+async function assertTargetIsAllowed(
+  targetDir: string,
+  forbiddenTargetRoots: readonly string[] = [],
+) {
+  const realTargetDir = await resolvePathThroughExistingAncestors(targetDir);
+
   for (const forbiddenRoot of forbiddenTargetRoots) {
-    if (isSameOrInside(targetDir, forbiddenRoot)) {
+    const realForbiddenRoot = await resolvePathThroughExistingAncestors(forbiddenRoot);
+
+    if (isSameOrInside(realTargetDir, realForbiddenRoot)) {
       throw new Error(
         `Generated project target ${resolve(targetDir)} must not be inside protected project root ${resolve(forbiddenRoot)}.`,
       );
@@ -166,12 +189,11 @@ function assertTargetIsAllowed(targetDir: string, forbiddenTargetRoots: readonly
   }
 }
 
-function assertNoDuplicatePaths(tree: VirtualFileTree) {
+function assertGeneratedPathsCanBeFiles(tree: VirtualFileTree) {
   const seen = new Set<string>();
+  const sortedPaths = tree.map((file) => validateVirtualFilePath(file.path)).sort();
 
-  for (const file of tree) {
-    const relativePath = validateVirtualFilePath(file.path);
-
+  for (const relativePath of sortedPaths) {
     if (seen.has(relativePath)) {
       throw new Error(
         `Generated file path ${JSON.stringify(relativePath)} appears more than once.`,
@@ -179,6 +201,17 @@ function assertNoDuplicatePaths(tree: VirtualFileTree) {
     }
 
     seen.add(relativePath);
+  }
+
+  for (let index = 0; index < sortedPaths.length - 1; index += 1) {
+    const relativePath = sortedPaths[index];
+    const nextPath = sortedPaths[index + 1];
+
+    if (nextPath.startsWith(`${relativePath}/`)) {
+      throw new Error(
+        `Generated file path ${JSON.stringify(relativePath)} conflicts with descendant path ${JSON.stringify(nextPath)}.`,
+      );
+    }
   }
 }
 
@@ -244,8 +277,8 @@ async function writeVirtualFile(target: WriteTarget): Promise<void> {
 export async function writeProject(options: WriteProjectOptions): Promise<WriteProjectResult> {
   const overwrite = options.overwrite ?? 'never';
 
-  assertNoDuplicatePaths(options.tree);
-  assertTargetIsAllowed(options.targetDir, options.forbiddenTargetRoots);
+  assertGeneratedPathsCanBeFiles(options.tree);
+  await assertTargetIsAllowed(options.targetDir, options.forbiddenTargetRoots);
   await assertTargetDirectory(options.targetDir);
 
   const targets: WriteTarget[] = [];
