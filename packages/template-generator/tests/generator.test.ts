@@ -522,8 +522,12 @@ test('Generic With Standalone App Variants Template generates App Variant assets
   assert.doesNotMatch(resolver, /runtimeTenants:/);
   assert.match(appConfig, /APP_VARIANT_SLUG/);
   assert.match(runtimeTenantAccess, /Duplicate Runtime Tenant ID/);
+  assert.match(runtimeTenantAccess, /validateGenericAppVariantCount/);
+  assert.match(runtimeTenantAccess, /genericAppVariants\.length !== 1/);
+  assert.match(runtimeTenantAccess, /must include exactly one Generic App Variant/);
   assert.match(runtimeTenantAccess, /Duplicate standalone Runtime Tenant assignment/);
   assert.match(runtimeTenantAccess, /must not appear in Generic App Variant Runtime Tenant Access/);
+  assert.match(resolver, /duplicateAppVariantId !== undefined/);
   assert.match(activeRuntimeTenantHook, /appVariant\.role === 'standalone'/);
   assert.match(
     activeRuntimeTenantHook,

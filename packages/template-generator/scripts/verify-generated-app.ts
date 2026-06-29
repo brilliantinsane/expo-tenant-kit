@@ -353,11 +353,15 @@ async function verifyGenericWithStandaloneAppVariants(targetDir: string) {
     resolver,
     /standaloneRuntimeTenantId: resolvedAppVariant\.standaloneRuntimeTenantId/,
   );
+  assert.match(resolver, /duplicateAppVariantId !== undefined/);
   assert.doesNotMatch(resolver, /runtimeTenants:/);
   assert.match(runtimeTenantAccess, /resolveDefaultRuntimeTenant/);
   assert.match(runtimeTenantAccess, /resolveSelectableRuntimeTenants/);
   assert.match(runtimeTenantAccess, /normalizeCapabilityProfile/);
   assert.match(runtimeTenantAccess, /Duplicate Runtime Tenant ID/);
+  assert.match(runtimeTenantAccess, /validateGenericAppVariantCount/);
+  assert.match(runtimeTenantAccess, /genericAppVariants\.length !== 1/);
+  assert.match(runtimeTenantAccess, /must include exactly one Generic App Variant/);
   assert.match(runtimeTenantAccess, /Duplicate standalone Runtime Tenant assignment/);
   assert.match(runtimeTenantAccess, /must not appear in Generic App Variant Runtime Tenant Access/);
   assert.match(activeRuntimeTenantHook, /useActiveRuntimeTenant/);

@@ -136,6 +136,16 @@ function validateStandaloneAppVariantAccess(
   }
 }
 
+function validateGenericAppVariantCount() {
+  const genericAppVariants = appVariants.filter((candidate) => candidate.role === 'generic');
+
+  if (genericAppVariants.length !== 1) {
+    fail(
+      `Generic With Standalone App Variants must include exactly one Generic App Variant, found ${genericAppVariants.length}`,
+    );
+  }
+}
+
 export function validateRuntimeTenantAccess({
   appVariant: resolvedAppVariant,
   runtimeTenants: availableRuntimeTenants = runtimeTenants,
@@ -144,6 +154,8 @@ export function validateRuntimeTenantAccess({
   const standaloneRuntimeTenantIds = getAppVariantRuntimeTenantIds(appVariants);
   const duplicateStandaloneRuntimeTenantId =
     findDuplicateRuntimeTenantId(standaloneRuntimeTenantIds);
+
+  validateGenericAppVariantCount();
 
   if (duplicateStandaloneRuntimeTenantId !== undefined) {
     fail(

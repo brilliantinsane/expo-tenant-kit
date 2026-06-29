@@ -31,7 +31,7 @@ function validateAppVariantIdentity() {
     appVariants.map((appVariant) => appVariant.appVariantId),
   );
 
-  if (duplicateAppVariantId) {
+  if (duplicateAppVariantId !== undefined) {
     fail(`Duplicate App Variant ID "${duplicateAppVariantId}" in App Variants`);
   }
 
