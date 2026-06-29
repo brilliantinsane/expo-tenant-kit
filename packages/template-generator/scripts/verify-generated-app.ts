@@ -178,6 +178,7 @@ async function verifySingleAppRuntimeTenants(targetDir: string) {
   assert.equal(packageJson.scripts?.typecheck, 'tsc --noEmit --pretty false');
   assert.equal(packageJson.dependencies?.['@expo/ui'], '~56.0.16');
   assert.equal(packageJson.dependencies?.['react-native-mmkv'], '^4.3.1');
+  assert.equal(packageJson.dependencies?.['react-native-nitro-modules'], '^0.35.9');
   assert.equal(packageJson.dependencies?.expo, '~56.0.12');
   assert.match(readme, /Runtime Tenant records live in generated source data/);
   assert.match(envExample, /APP_VARIANT_SLUG=acme-app/);

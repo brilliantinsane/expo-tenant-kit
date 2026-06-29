@@ -339,6 +339,7 @@ test('Single App Runtime Tenants Template generates one App Variant with bundled
   assert.equal(packageJson.name, 'custom-runtime-tenants');
   assert.equal(packageJson.dependencies['@expo/ui'], '~56.0.16');
   assert.equal(packageJson.dependencies['react-native-mmkv'], '^4.3.1');
+  assert.equal(packageJson.dependencies['react-native-nitro-modules'], '^0.35.9');
   assert.equal(packageJson.scripts.tenkit, 'tsx scripts/tenkit-cli.ts');
   assert.ok(paths.includes('src/app/settings.tsx'));
   assert.equal(paths.includes('src/app/explore.tsx'), false);
