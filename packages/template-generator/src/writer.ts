@@ -269,12 +269,7 @@ async function planVirtualFileWrite({
   return { ...target, file, outcome: 'written' };
 }
 
-async function writeVirtualFile(target: WriteTarget): Promise<void> {
-  await fs.ensureDir(dirname(target.path));
-  await fs.writeFile(target.path, target.file.contents);
-}
-
-export async function writeProject(options: WriteProjectOptions): Promise<WriteProjectResult> {
+async function planProjectWrite(options: WriteProjectOptions): Promise<WriteTarget[]> {
   const overwrite = options.overwrite ?? 'never';
 
   assertGeneratedPathsCanBeFiles(options.tree);
@@ -287,6 +282,20 @@ export async function writeProject(options: WriteProjectOptions): Promise<WriteP
     targets.push(await planVirtualFileWrite({ file, targetDir: options.targetDir, overwrite }));
   }
 
+  return targets;
+}
+
+async function writeVirtualFile(target: WriteTarget): Promise<void> {
+  await fs.ensureDir(dirname(target.path));
+  await fs.writeFile(target.path, target.file.contents);
+}
+
+export async function preflightWriteProject(options: WriteProjectOptions): Promise<void> {
+  await planProjectWrite(options);
+}
+
+export async function writeProject(options: WriteProjectOptions): Promise<WriteProjectResult> {
+  const targets = await planProjectWrite(options);
   const result: WriteProjectResult = {
     targetDir: resolve(options.targetDir),
     filesWritten: [],

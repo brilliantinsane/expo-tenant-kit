@@ -7,7 +7,7 @@ import test from 'node:test';
 import fs from 'fs-extra';
 import { join } from 'pathe';
 
-import { validateVirtualFilePath, writeProject } from '../src/writer';
+import { preflightWriteProject, validateVirtualFilePath, writeProject } from '../src/writer';
 import { type VirtualFileTree } from '../src/virtual-file-tree';
 
 async function createTempRoot(): Promise<string> {
@@ -211,6 +211,49 @@ test('writer rejects targets inside protected project roots', async () => {
     assert.equal(await fs.pathExists(join(targetDir, 'package.json')), false);
   } finally {
     await fs.remove(tempRoot);
+  }
+});
+
+test('writer preflight validates protected project roots without writing', async () => {
+  const tempRoot = await createTempRoot();
+  const playgroundDir = join(tempRoot, 'apps/playground');
+  const targetDir = join(playgroundDir, 'generated-app');
+
+  try {
+    await assert.rejects(
+      () =>
+        preflightWriteProject({
+          targetDir,
+          tree: [{ path: 'package.json', contents: '{}\n' }],
+          forbiddenTargetRoots: [playgroundDir],
+        }),
+      /protected project root/,
+    );
+
+    assert.equal(await fs.pathExists(join(targetDir, 'package.json')), false);
+  } finally {
+    await fs.remove(tempRoot);
+  }
+});
+
+test('writer preflight detects existing file conflicts without writing', async () => {
+  const targetDir = await createTempRoot();
+
+  try {
+    await fs.writeFile(join(targetDir, 'package.json'), 'existing\n', 'utf8');
+
+    await assert.rejects(
+      () =>
+        preflightWriteProject({
+          targetDir,
+          tree: [{ path: 'package.json', contents: '{}\n' }],
+        }),
+      /Refusing to overwrite/,
+    );
+
+    assert.equal(await fs.readFile(join(targetDir, 'package.json'), 'utf8'), 'existing\n');
+  } finally {
+    await fs.remove(targetDir);
   }
 });
 

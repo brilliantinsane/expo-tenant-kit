@@ -242,7 +242,7 @@ test('local proof command boundary generates Single App Runtime Tenants by Setup
     assert.ok(result.filesWritten.includes('package.json'));
     assert.equal(result.gitInitialized, true);
     assert.equal(result.gitCommitted, false);
-    assert.equal(packageJson.name, 'tenkit-single-app-runtime-tenants');
+    assert.equal(packageJson.name, 'tenkit-runtime-tenants');
     assert.equal(packageJson.scripts?.tenkit, 'tsx scripts/tenkit-cli.ts');
     assert.match(appVariant, /export const appVariant =/);
     assert.match(appVariant, /slug: 'acme-app'/);
@@ -315,7 +315,7 @@ test('local proof command boundary generates Generic With Standalone App Variant
     assert.ok(result.filesWritten.includes('package.json'));
     assert.equal(result.gitInitialized, true);
     assert.equal(result.gitCommitted, false);
-    assert.equal(packageJson.name, 'tenkit-generic-with-standalone-app-variants');
+    assert.equal(packageJson.name, 'tenkit-generic-standalone');
     assert.equal(packageJson.scripts?.tenkit, 'tsx scripts/tenkit-cli.ts');
     assert.match(appVariants, /role: 'generic'/);
     assert.match(appVariants, /slug: 'atlas-network'/);

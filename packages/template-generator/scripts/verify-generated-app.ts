@@ -7,7 +7,12 @@ import { promisify } from 'node:util';
 import fs from 'fs-extra';
 import { join, resolve } from 'pathe';
 
-import { SUPPORTED_GENERATED_SETUP_TYPES, type GeneratedSetupType } from '../src/generator';
+import {
+  formatSupportedGeneratedSetupTypes,
+  normalizeGeneratedSetupType,
+  SUPPORTED_PUBLIC_SETUP_SLUGS,
+  type GeneratedSetupType,
+} from '../src/generator';
 import { commitInitialGitSnapshot, runGenerationProof } from '../src/local-proof';
 
 const execFileAsync = promisify(execFile);
@@ -20,7 +25,7 @@ type PackageJson = {
 };
 
 function usage(): string {
-  return `Usage: pnpm -F @tenkit/template-generator verify:generated-app -- --setup-type <${SUPPORTED_GENERATED_SETUP_TYPES.join('|')}>`;
+  return `Usage: pnpm -F @tenkit/template-generator verify:generated-app -- --setup-type <${SUPPORTED_PUBLIC_SETUP_SLUGS.join('|')}>`;
 }
 
 function parseSetupType(args: string[]): GeneratedSetupType {
@@ -31,13 +36,13 @@ function parseSetupType(args: string[]): GeneratedSetupType {
     throw new Error(`Missing --setup-type.\n${usage()}`);
   }
 
-  if (SUPPORTED_GENERATED_SETUP_TYPES.includes(setupType as GeneratedSetupType)) {
-    return setupType as GeneratedSetupType;
+  try {
+    return normalizeGeneratedSetupType(setupType);
+  } catch {
+    throw new Error(
+      `Unsupported generated Setup Type ${JSON.stringify(setupType)}. Expected ${formatSupportedGeneratedSetupTypes()}.`,
+    );
   }
-
-  throw new Error(
-    `Unsupported generated Setup Type ${JSON.stringify(setupType)}. Expected one of: ${SUPPORTED_GENERATED_SETUP_TYPES.join(', ')}`,
-  );
 }
 
 async function readText(path: string): Promise<string> {
@@ -184,7 +189,7 @@ async function verifySingleAppRuntimeTenants(targetDir: string) {
   const app = await readText(join(targetDir, 'src/app/index.tsx'));
   const settings = await readText(join(targetDir, 'src/app/settings.tsx'));
 
-  assert.equal(packageJson.name, 'tenkit-single-app-runtime-tenants');
+  assert.equal(packageJson.name, 'tenkit-runtime-tenants');
   assert.equal(packageJson.scripts?.tenkit, 'tsx scripts/tenkit-cli.ts');
   assert.equal(packageJson.scripts?.typecheck, 'tsc --noEmit --pretty false');
   assert.equal(packageJson.dependencies?.['@expo/ui'], '~56.0.16');
@@ -316,7 +321,7 @@ async function verifyGenericWithStandaloneAppVariants(targetDir: string) {
   const app = await readText(join(targetDir, 'src/app/index.tsx'));
   const settings = await readText(join(targetDir, 'src/app/settings.tsx'));
 
-  assert.equal(packageJson.name, 'tenkit-generic-with-standalone-app-variants');
+  assert.equal(packageJson.name, 'tenkit-generic-standalone');
   assert.equal(packageJson.scripts?.tenkit, 'tsx scripts/tenkit-cli.ts');
   assert.equal(packageJson.scripts?.typecheck, 'tsc --noEmit --pretty false');
   assert.equal(packageJson.dependencies?.['@expo/ui'], '~56.0.16');
