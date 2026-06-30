@@ -1,22 +1,34 @@
 {
   "name": "@tenkit/template-generator",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./generator": "./src/generator.ts",
-    "./writer": "./src/writer.ts",
-    "./local-proof": "./src/local-proof.ts"
+    ".": "./dist/index.mjs",
+    "./generator": "./dist/generator.mjs",
+    "./writer": "./dist/writer.mjs",
+    "./local-proof": "./dist/local-proof.mjs"
   },
+  "files": [
+    "dist",
+    "templates",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
+    "build": "tsdown src/index.ts src/generator.ts src/writer.ts src/local-proof.ts --format esm --dts",
+    "pack:dry-run": "pnpm pack --dry-run",
+    "prepack": "pnpm run build",
     "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit --pretty false",
     "generate:proof": "tsx scripts/generate-proof.ts",
     "generate:white-label-proof": "tsx scripts/generate-white-label-proof.ts",
+    "generate:runtime-tenants-proof": "tsx scripts/generate-proof.ts --setup-type runtime-tenants",
+    "generate:generic-standalone-proof": "tsx scripts/generate-proof.ts --setup-type generic-standalone",
     "generate:generic-with-standalone-app-variants-proof": "tsx scripts/generate-proof.ts --setup-type generic-with-standalone-app-variants",
     "generate:single-app-runtime-tenants-proof": "tsx scripts/generate-proof.ts --setup-type single-app-runtime-tenants",
     "verify:generated-app": "tsx scripts/verify-generated-app.ts",
+    "verify:generated-runtime-tenants": "tsx scripts/verify-generated-app.ts --setup-type runtime-tenants",
+    "verify:generated-generic-standalone": "tsx scripts/verify-generated-app.ts --setup-type generic-standalone",
     "verify:generated-generic-with-standalone-app-variants": "tsx scripts/verify-generated-app.ts --setup-type generic-with-standalone-app-variants",
     "verify:generated-single-app-runtime-tenants": "tsx scripts/verify-generated-app.ts --setup-type single-app-runtime-tenants",
     "verify:generated-white-label": "tsx scripts/verify-generated-white-label-app.ts"
@@ -34,5 +46,8 @@
     "is-binary-path": "^3.0.0",
     "pathe": "^2.0.3",
     "tinyglobby": "^0.2.17"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

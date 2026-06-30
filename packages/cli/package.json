@@ -1,0 +1,40 @@
+{
+  "name": "@tenkit/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "tenkit": "./dist/index.mjs"
+  },
+  "exports": {
+    ".": "./dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm -F @tenkit/template-generator build && tsdown src/index.ts --format esm --dts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit --pretty false",
+    "pack:dry-run": "pnpm pack --dry-run",
+    "prepack": "pnpm run build"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.6.0",
+    "@tenkit/template-generator": "workspace:*",
+    "commander": "^15.0.0",
+    "fs-extra": "^11.3.5",
+    "pathe": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.9.3",
+    "tsdown": "^0.22.3",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

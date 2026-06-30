@@ -3,7 +3,12 @@ import { fileURLToPath } from 'node:url';
 
 import { resolve } from 'pathe';
 
-import { SUPPORTED_GENERATED_SETUP_TYPES, type GeneratedSetupType } from '../src/generator';
+import {
+  formatSupportedGeneratedSetupTypes,
+  normalizeGeneratedSetupType,
+  SUPPORTED_PUBLIC_SETUP_SLUGS,
+  type GeneratedSetupType,
+} from '../src/generator';
 import { runGenerationProof, tryCommitInitialGitSnapshot } from '../src/local-proof';
 
 type ParsedArgs = {
@@ -21,7 +26,7 @@ type ResolvedArgs = ParsedArgs & {
 };
 
 function usage(): string {
-  return `Usage: pnpm -F @tenkit/template-generator generate:proof -- --setup-type <${SUPPORTED_GENERATED_SETUP_TYPES.join('|')}> --target <folder> [--force] [--no-install] [--project-name <name>] [--package-name <name>]`;
+  return `Usage: pnpm -F @tenkit/template-generator generate:proof -- --setup-type <${SUPPORTED_PUBLIC_SETUP_SLUGS.join('|')}> --target <folder> [--force] [--no-install] [--project-name <name>] [--package-name <name>]`;
 }
 
 function readValue(args: string[], index: number, flag: string): string {
@@ -35,13 +40,13 @@ function readValue(args: string[], index: number, flag: string): string {
 }
 
 function parseSetupType(value: string): GeneratedSetupType {
-  if (SUPPORTED_GENERATED_SETUP_TYPES.includes(value as GeneratedSetupType)) {
-    return value as GeneratedSetupType;
+  try {
+    return normalizeGeneratedSetupType(value);
+  } catch {
+    throw new Error(
+      `Unsupported generated Setup Type ${JSON.stringify(value)}. Expected ${formatSupportedGeneratedSetupTypes()}.`,
+    );
   }
-
-  throw new Error(
-    `Unsupported generated Setup Type ${JSON.stringify(value)}. Expected one of: ${SUPPORTED_GENERATED_SETUP_TYPES.join(', ')}`,
-  );
 }
 
 function parseArgs(args: string[]): ResolvedArgs {

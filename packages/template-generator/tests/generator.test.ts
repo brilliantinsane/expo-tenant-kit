@@ -68,11 +68,31 @@ test('generic Template generation dispatches by Setup Type', () => {
   );
   assert.deepEqual(
     generateProject({
+      setupType: 'runtime-tenants',
+      projectName: 'Example App',
+    }),
+    generateSingleAppRuntimeTenantsProject({
+      setupType: 'runtime-tenants',
+      projectName: 'Example App',
+    }),
+  );
+  assert.deepEqual(
+    generateProject({
       setupType: 'single-app-runtime-tenants',
       projectName: 'Example App',
     }),
     generateSingleAppRuntimeTenantsProject({
       setupType: 'single-app-runtime-tenants',
+      projectName: 'Example App',
+    }),
+  );
+  assert.deepEqual(
+    generateProject({
+      setupType: 'generic-standalone',
+      projectName: 'Example App',
+    }),
+    generateGenericWithStandaloneAppVariantsProject({
+      setupType: 'generic-standalone',
       projectName: 'Example App',
     }),
   );
@@ -94,7 +114,7 @@ test('generic Template generation rejects unsupported Setup Types', () => {
       generateProject({
         setupType: 'unsupported-setup',
       } as unknown as Parameters<typeof generateProject>[0]),
-    /Unsupported generated Setup Type "unsupported-setup".*white-label-apps, single-app-runtime-tenants, generic-with-standalone-app-variants/,
+    /Unsupported generated Setup Type "unsupported-setup".*public Setup slugs: white-label, runtime-tenants, generic-standalone; canonical Setup Type IDs: white-label-apps, single-app-runtime-tenants, generic-with-standalone-app-variants/,
   );
 });
 
