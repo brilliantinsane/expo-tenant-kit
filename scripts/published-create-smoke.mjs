@@ -20,7 +20,6 @@ function runCreate() {
     [
       'create',
       `tenkit@${distTag}`,
-      '--',
       '--name',
       smokeProjectName,
       '--setup',
