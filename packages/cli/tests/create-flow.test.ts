@@ -8,9 +8,9 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { isDirectCliRun } from '../src/adapters/workspace';
 import { createProgram } from '../src/commands/create';
 import { DEFAULT_PROJECT_NAME, PROMPT_CANCELLED } from '../src/constants';
+import { normalizePackageManagerInput } from '../src/create/package-manager';
 import { runCreateFlow } from '../src/create/run-create';
 import type { CreateFlowEnvironment, PromptAdapter } from '../src/create/types';
-import { normalizePackageManagerInput } from '../src/create/package-manager';
 import {
   derivePackageName,
   normalizeSetupInput,
@@ -720,7 +720,7 @@ describe('Commander contract', () => {
     await expect(program.parseAsync(['--version'], { from: 'user' })).rejects.toMatchObject({
       code: 'commander.version',
     });
-    expect(lines.join('\n')).toContain('0.1.1');
+    expect(lines.join('\n')).toContain('0.1.2');
   });
 
   test('rejects explicitly empty git mode from Commander options', async () => {
