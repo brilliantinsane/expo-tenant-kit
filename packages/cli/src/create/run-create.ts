@@ -4,7 +4,6 @@ import { generateProject, preflightWriteProject, writeProject } from '@tenkit/te
 import { defaultRunCommand } from '../adapters/command-runner';
 import { prepareInitialGitSetup } from '../adapters/git';
 import { logFinalOutput } from './create-messages';
-import { setGeneratedPackageManagerVersion } from './package-manager-version';
 import { resolveCreateOptions } from './resolve-create-options';
 import type { CreateCommandOptions, CreateFlowEnvironment, CreateFlowResult } from './types';
 
@@ -70,11 +69,6 @@ export async function runCreateFlow(
     targetDir: resolvedOptions.targetDir,
     tree,
     forbiddenTargetRoots: env.workspaceRoot ? [env.workspaceRoot] : [],
-  });
-  await setGeneratedPackageManagerVersion({
-    targetDir: writeResult.targetDir,
-    packageManager: resolvedOptions.packageManager,
-    runCommand,
   });
   let installed = false;
   let installFailed = false;

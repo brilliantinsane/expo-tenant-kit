@@ -15,7 +15,8 @@ vi.mock('@clack/prompts', () => ({
 
 test('text prompt accepts an empty submission as the default value', async () => {
   textPrompt.mockImplementationOnce(
-    async (options: { validate(value: string): string | undefined }) => {
+    async (options: { defaultValue?: string; validate(value: string): string | undefined }) => {
+      expect(options.defaultValue).toBeUndefined();
       expect(options.validate('')).toBeUndefined();
       return '';
     },

@@ -356,9 +356,30 @@ test('Template generation renders selected package manager into generated app ou
     packageName: 'npm-app',
     packageManager: 'npm',
   });
+  const npmPackageJson = JSON.parse(readVirtualFile(npmTree, 'package.json')) as {
+    packageManager?: string;
+  };
 
+  assert.equal(npmPackageJson.packageManager, undefined);
   assert.match(readVirtualFile(npmTree, 'README.md'), /npm run tenkit -- build/);
   assert.match(readVirtualFile(npmTree, 'scripts/tenkit-cli-core.ts'), /bin: 'npx'/);
+
+  const runtimeTenantsTree = generateSingleAppRuntimeTenantsProject({
+    setupType: 'single-app-runtime-tenants',
+    projectName: 'Runtime Tenants App',
+    packageName: 'runtime-tenants-app',
+    packageManager: 'pnpm',
+  });
+  const runtimeTenantsPackageJson = JSON.parse(
+    readVirtualFile(runtimeTenantsTree, 'package.json'),
+  ) as {
+    packageManager?: string;
+  };
+
+  assert.equal(runtimeTenantsPackageJson.packageManager, undefined);
+  assert.match(readVirtualFile(runtimeTenantsTree, 'README.md'), /pnpm install/);
+  assert.match(readVirtualFile(runtimeTenantsTree, 'README.md'), /pnpm run tenkit build/);
+  assert.match(readVirtualFile(runtimeTenantsTree, 'scripts/tenkit-cli-core.ts'), /bin: 'pnpm'/);
 });
 
 test('White Label Apps generated tree is standalone and does not import from the Playground', () => {
